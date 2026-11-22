@@ -92,7 +92,7 @@
           `Default Easing: ${study.defaultEasing}`,
           `Triggers: ${study.triggers}`,
           `Design Rationale: ${study.notes}`,
-          `Fetch full CSS/JS from: https://17860288878k-debug.github.io/motion-lab/registry.json (or call MCP tool get_motion_spec with id="${study.id}").`,
+          `Fetch full CSS/JS from: https://hmkkaii.github.io/motion-lab/registry.json (or call MCP tool get_motion_spec with id="${study.id}").`,
           `Preserve mid-flight interruption safety and prefers-reduced-motion compliance.`
         ].join("\n");
         if (window.MotionLabApp) {

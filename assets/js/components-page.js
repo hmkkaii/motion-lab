@@ -17,7 +17,7 @@
       `Summary: ${comp.tagline}`,
       `Interactions: ${comp.triggers}`,
       `Motion Tokens: ${comp.tokens}`,
-      `Full CSS/JS Source: https://17860288878k-debug.github.io/motion-lab/registry.json (or call MCP tool get_component_code with id="${comp.id}").`,
+      `Full CSS/JS Source: https://hmkkaii.github.io/motion-lab/registry.json (or call MCP tool get_component_code with id="${comp.id}").`,
       `Requirements:`,
       `- Pure semantic HTML/CSS/JS (or adapt cleanly to current project framework) with zero layout shift.`,
       `- Respect prefers-reduced-motion and full keyboard accessibility (buttons/tabs/ARIA states).`,

@@ -7,10 +7,10 @@ description: Apply Motion Lab's interactive UI motion tokens, 12 motion studies,
 
 Use this skill whenever building, refining, or reviewing UI transitions, micro-interactions, or interactive widgets so interfaces feel crisp, interruptible, and accessible.
 
-- **Live Playground**: https://17860288878k-debug.github.io/motion-lab/
-- **Machine Registry**: https://17860288878k-debug.github.io/motion-lab/registry.json
-- **LLM Index**: https://17860288878k-debug.github.io/motion-lab/llms.txt
-- **Full Single-File Reference**: https://17860288878k-debug.github.io/motion-lab/llms-full.txt
+- **Live Playground**: https://hmkkaii.github.io/motion-lab/
+- **Machine Registry**: https://hmkkaii.github.io/motion-lab/registry.json
+- **LLM Index**: https://hmkkaii.github.io/motion-lab/llms.txt
+- **Full Single-File Reference**: https://hmkkaii.github.io/motion-lab/llms-full.txt
 
 ---
 
@@ -69,4 +69,4 @@ Include these semantic tokens in `:root` and reference them instead of arbitrary
 ## 4. How to Retrieve Exact Code
 
 - **With Motion Lab MCP connected**: Call `list_motions`, `get_motion_spec`, `list_components`, `get_component_code`, or `get_easing_tokens` directly.
-- **Without MCP (Web / Local Clone)**: Fetch `https://17860288878k-debug.github.io/motion-lab/registry.json` (or `llms-full.txt`) and adapt the returned zero-dependency HTML/CSS/JS cleanly into the target project's stack (Vanilla JS, React, Tailwind, Vue, or Svelte) while preserving exact easing curves, asymmetric durations, ARIA attributes, and reduced-motion guards.
+- **Without MCP (Web / Local Clone)**: Fetch `https://hmkkaii.github.io/motion-lab/registry.json` (or `llms-full.txt`) and adapt the returned zero-dependency HTML/CSS/JS cleanly into the target project's stack (Vanilla JS, React, Tailwind, Vue, or Svelte) while preserving exact easing curves, asymmetric durations, ARIA attributes, and reduced-motion guards.

@@ -4,12 +4,12 @@
 
 Zero-dependency semantic HTML, CSS custom properties, and Vanilla JavaScript — with live clickable previews, real-time parameter tuning, and machine-readable AI endpoints.
 
-- **Live Website**: https://17860288878k-debug.github.io/motion-lab/
-- **Interactive UI Components**: https://17860288878k-debug.github.io/motion-lab/components.html
-- **Skill & MCP Setup Hub**: https://17860288878k-debug.github.io/motion-lab/ai.html
-- **Machine Registry (`registry.json`)**: https://17860288878k-debug.github.io/motion-lab/registry.json
-- **LLM Index (`llms.txt`)**: https://17860288878k-debug.github.io/motion-lab/llms.txt
-- **Repository**: https://github.com/17860288878k-debug/motion-lab
+- **Live Website**: https://hmkkaii.github.io/motion-lab/
+- **Interactive UI Components**: https://hmkkaii.github.io/motion-lab/components.html
+- **Skill & MCP Setup Hub**: https://hmkkaii.github.io/motion-lab/ai.html
+- **Machine Registry (`registry.json`)**: https://hmkkaii.github.io/motion-lab/registry.json
+- **LLM Index (`llms.txt`)**: https://hmkkaii.github.io/motion-lab/llms.txt
+- **Repository**: https://github.com/hmkkaii/motion-lab
 
 ---
 
@@ -42,11 +42,11 @@ Zero-dependency semantic HTML, CSS custom properties, and Vanilla JavaScript —
 ### Option A: Zero-Install via `llms.txt` / `registry.json`
 Paste into any AI coding agent with web fetch:
 
-> Read `https://17860288878k-debug.github.io/motion-lab/llms.txt` and `https://17860288878k-debug.github.io/motion-lab/registry.json`, then implement `"origin-menu"` and `"pulse-climate"` in my project using Motion Lab's exact cubic-bezier curves and reduced-motion guards.
+> Read `https://hmkkaii.github.io/motion-lab/llms.txt` and `https://hmkkaii.github.io/motion-lab/registry.json`, then implement `"origin-menu"` and `"pulse-climate"` in my project using Motion Lab's exact cubic-bezier curves and reduced-motion guards.
 
 ### Option B: Install the Agent Skill (`SKILL.md`)
 ```bash
-git clone https://github.com/17860288878k-debug/motion-lab.git ~/motion-lab
+git clone https://github.com/hmkkaii/motion-lab.git ~/motion-lab
 
 # Claude Code
 mkdir -p ~/.claude/skills/motion-lab

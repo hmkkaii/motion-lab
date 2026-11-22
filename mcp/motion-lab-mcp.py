@@ -29,8 +29,8 @@ SERVER_INFO = {
     "version": "2.0.0",
 }
 PROTOCOL_VERSION = "2024-11-05"
-REMOTE_REGISTRY_URL = "https://17860288878k-debug.github.io/motion-lab/registry.json"
-REMOTE_LLMS_URL = "https://17860288878k-debug.github.io/motion-lab/llms.txt"
+REMOTE_REGISTRY_URL = "https://hmkkaii.github.io/motion-lab/registry.json"
+REMOTE_LLMS_URL = "https://hmkkaii.github.io/motion-lab/llms.txt"
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 LOCAL_REGISTRY = REPO_ROOT / "registry.json"

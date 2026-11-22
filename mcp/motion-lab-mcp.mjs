@@ -15,8 +15,8 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dirname, "..");
 const LOCAL_REGISTRY = resolve(REPO_ROOT, "registry.json");
 const LOCAL_LLMS = resolve(REPO_ROOT, "llms.txt");
-const REMOTE_REGISTRY_URL = "https://17860288878k-debug.github.io/motion-lab/registry.json";
-const REMOTE_LLMS_URL = "https://17860288878k-debug.github.io/motion-lab/llms.txt";
+const REMOTE_REGISTRY_URL = "https://hmkkaii.github.io/motion-lab/registry.json";
+const REMOTE_LLMS_URL = "https://hmkkaii.github.io/motion-lab/llms.txt";
 
 const SERVER_INFO = { name: "motion-lab", version: "2.0.0" };
 const PROTOCOL_VERSION = "2024-11-05";

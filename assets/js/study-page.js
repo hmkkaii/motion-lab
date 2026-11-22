@@ -198,7 +198,7 @@
         "",
         `Triggers: ${study.triggers}`,
         `Design Rationale: ${study.notes}`,
-        `Reference spec & CSS/JS: https://17860288878k-debug.github.io/motion-lab/registry.json (or MCP tool get_motion_spec id="${study.id}").`,
+        `Reference spec & CSS/JS: https://hmkkaii.github.io/motion-lab/registry.json (or MCP tool get_motion_spec id="${study.id}").`,
         `Requirements: preserve mid-flight interruption safety, keyboard accessibility, and prefers-reduced-motion compliance.`
       ].join("\n");
       if (window.MotionLabApp) {

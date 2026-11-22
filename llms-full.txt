@@ -1,8 +1,8 @@
 # Motion Lab v2.0 — Complete AI Reference
 
-- Live Site: https://17860288878k-debug.github.io/motion-lab/
-- Registry JSON: https://17860288878k-debug.github.io/motion-lab/registry.json
-- Repository: https://github.com/17860288878k-debug/motion-lab
+- Live Site: https://hmkkaii.github.io/motion-lab/
+- Registry JSON: https://hmkkaii.github.io/motion-lab/registry.json
+- Repository: https://github.com/hmkkaii/motion-lab
 - Inventory: 12 interactive motion studies + 8 interactive UI components + 6 easing curves + 7 duration tokens (zero runtime dependencies).
 
 ## Design Principles
@@ -62,7 +62,7 @@
 ### Adaptive Card Resize (`adaptive-card`)
 - **Category**: Surfaces | **Spec**: 300ms · smooth-out | **Triggers**: Click / Mid-flight interrupt
 - **Default Easing**: `cubic-bezier(0.22, 1, 0.36, 1)`
-- **Workbench**: https://17860288878k-debug.github.io/motion-lab/study.html?id=adaptive-card
+- **Workbench**: https://hmkkaii.github.io/motion-lab/study.html?id=adaptive-card
 - **Rationale**: Uses a decelerating smooth-out curve so layout changes feel responsive immediately on click and settle cleanly without bounce.
 
 #### CSS
@@ -146,7 +146,7 @@ if (id === "adaptive-card") {
 ### Origin-Aware Action Menu (`origin-menu`)
 - **Category**: Surfaces | **Spec**: 250ms in / 150ms out | **Triggers**: Click / Outside dismiss / Escape / Interrupt
 - **Default Easing**: `cubic-bezier(0.22, 1, 0.36, 1)`
-- **Workbench**: https://17860288878k-debug.github.io/motion-lab/study.html?id=origin-menu
+- **Workbench**: https://hmkkaii.github.io/motion-lab/study.html?id=origin-menu
 - **Rationale**: Transform origin locks to top-center so the surface expands from its button; closing is 100ms faster with softer scale (0.99) to stay out of the user's way.
 
 #### CSS
@@ -318,7 +318,7 @@ else if (id === "origin-menu") {
 ### Focal Scale Dialog (`scale-dialog`)
 - **Category**: Surfaces | **Spec**: 250ms in / 150ms out | **Triggers**: Click / Backdrop / Escape
 - **Default Easing**: `cubic-bezier(0.22, 1, 0.36, 1)`
-- **Workbench**: https://17860288878k-debug.github.io/motion-lab/study.html?id=scale-dialog
+- **Workbench**: https://hmkkaii.github.io/motion-lab/study.html?id=scale-dialog
 - **Rationale**: Starting at 0.96 instead of 0.8 keeps focal modals crisp and architectural rather than cartoonish.
 
 #### CSS
@@ -450,7 +450,7 @@ else if (id === "scale-dialog") {
 ### Measured Sliding Tabs (`sliding-tabs`)
 - **Category**: Navigation | **Spec**: 250ms · measured pill | **Triggers**: Click / Rapid interrupt
 - **Default Easing**: `cubic-bezier(0.22, 1, 0.36, 1)`
-- **Workbench**: https://17860288878k-debug.github.io/motion-lab/study.html?id=sliding-tabs
+- **Workbench**: https://hmkkaii.github.io/motion-lab/study.html?id=sliding-tabs
 - **Rationale**: Measures offsetLeft and offsetWidth of the target button on click and on ResizeObserver, keeping transform and width synchronized.
 
 #### CSS
@@ -564,7 +564,7 @@ else if (id === "sliding-tabs") {
 ### Grid-Row Accordion (`accordion-disclosure`)
 - **Category**: Navigation | **Spec**: 250ms · 0fr ↔ 1fr | **Triggers**: Click / Toggle / Interrupt
 - **Default Easing**: `cubic-bezier(0.22, 1, 0.36, 1)`
-- **Workbench**: https://17860288878k-debug.github.io/motion-lab/study.html?id=accordion-disclosure
+- **Workbench**: https://hmkkaii.github.io/motion-lab/study.html?id=accordion-disclosure
 - **Rationale**: Animates grid-template-rows from 0fr to 1fr without hardcoded max-height hacks, preserving exact content height.
 
 #### CSS
@@ -677,7 +677,7 @@ else if (id === "accordion-disclosure") {
 ### Directional View Slide (`page-transition`)
 - **Category**: Navigation | **Spec**: 250ms · ±10px + 3px blur | **Triggers**: Click Forward / Back
 - **Default Easing**: `cubic-bezier(0.22, 1, 0.36, 1)`
-- **Workbench**: https://17860288878k-debug.github.io/motion-lab/study.html?id=page-transition
+- **Workbench**: https://hmkkaii.github.io/motion-lab/study.html?id=page-transition
 - **Rationale**: Short spatial displacement paired with mild blur communicates hierarchy direction without causing motion fatigue.
 
 #### CSS
@@ -796,7 +796,7 @@ else if (id === "page-transition") {
 ### Stacked Notification Banners (`toast-stack`)
 - **Category**: Feedback | **Spec**: 350ms in · Hover/Tap fan-out | **Triggers**: Click Push / Hover or Tap spread
 - **Default Easing**: `cubic-bezier(0.22, 1, 0.36, 1)`
-- **Workbench**: https://17860288878k-debug.github.io/motion-lab/study.html?id=toast-stack
+- **Workbench**: https://hmkkaii.github.io/motion-lab/study.html?id=toast-stack
 - **Rationale**: Receding cards scale down by 6% per layer with progressive opacity and blur, then unfold cleanly into a full list on hover or mobile tap.
 
 #### CSS
@@ -912,7 +912,7 @@ else if (id === "toast-stack") {
 ### Segmented Validation Shake (`validation-shake`)
 - **Category**: Feedback | **Spec**: 280ms shake · 3s auto-revert | **Triggers**: Click / Auto-revert / Input
 - **Default Easing**: `cubic-bezier(0.22, 1, 0.36, 1)`
-- **Workbench**: https://17860288878k-debug.github.io/motion-lab/study.html?id=validation-shake
+- **Workbench**: https://hmkkaii.github.io/motion-lab/study.html?id=validation-shake
 - **Rationale**: Decaying horizontal oscillations mimic physical rejection while automatically clearing transient error highlights once acknowledged.
 
 #### CSS
@@ -1016,7 +1016,7 @@ else if (id === "validation-shake") {
 ### Composed Success Check (`confirm-check`)
 - **Category**: Feedback | **Spec**: 500ms · 80ms stroke delay | **Triggers**: Click Replay / Reset
 - **Default Easing**: `cubic-bezier(0.22, 1, 0.36, 1)`
-- **Workbench**: https://17860288878k-debug.github.io/motion-lab/study.html?id=confirm-check
+- **Workbench**: https://hmkkaii.github.io/motion-lab/study.html?id=confirm-check
 - **Rationale**: Delaying the SVG checkmark stroke by 80ms lets the circular badge establish presence before the tick draws itself.
 
 #### CSS
@@ -1113,7 +1113,7 @@ else if (id === "confirm-check") {
 ### Spring Heart & Particle Burst (`spring-like`)
 - **Category**: Micro-Motion | **Spec**: 350ms pop · 600ms burst | **Triggers**: Click / Double-click safe
 - **Default Easing**: `cubic-bezier(0.34, 1.96, 0.64, 1)`
-- **Workbench**: https://17860288878k-debug.github.io/motion-lab/study.html?id=spring-like
+- **Workbench**: https://hmkkaii.github.io/motion-lab/study.html?id=spring-like
 - **Rationale**: Asymmetry applies to micro-feedback too: liking celebrates with particles and overshoot while unliking stays quiet and immediate.
 
 #### CSS
@@ -1242,7 +1242,7 @@ else if (id === "spring-like") {
 ### 3D Drum Counter (`drum-counter`)
 - **Category**: Micro-Motion | **Spec**: 520ms · 40ms stagger | **Triggers**: Click +12 / +135 / -24
 - **Default Easing**: `cubic-bezier(0.34, 1.36, 0.64, 1)`
-- **Workbench**: https://17860288878k-debug.github.io/motion-lab/study.html?id=drum-counter
+- **Workbench**: https://hmkkaii.github.io/motion-lab/study.html?id=drum-counter
 - **Rationale**: Direction follows value sign (+ rises from below, - drops from above) and tabular numerals prevent horizontal layout jitter.
 
 #### CSS
@@ -1367,7 +1367,7 @@ else if (id === "drum-counter") {
 ### Magnetic Avatar Wave & 3D Tilt (`hover-cluster`)
 - **Category**: Micro-Motion | **Spec**: 320ms wave · 3D glare | **Triggers**: Hover / Tap / Pointermove / Leave
 - **Default Easing**: `cubic-bezier(0.34, 3.85, 0.64, 1)`
-- **Workbench**: https://17860288878k-debug.github.io/motion-lab/study.html?id=hover-cluster
+- **Workbench**: https://hmkkaii.github.io/motion-lab/study.html?id=hover-cluster
 - **Rationale**: Neighbor displacement decays exponentially (0.45^distance) on hover-in and snaps back with a lively spring curve on mouse leave.
 
 #### CSS
@@ -1616,7 +1616,7 @@ else if (id === "hover-cluster") {
 ### Pulse Climate Dial (`pulse-climate`)
 - **Category**: Controls | **Triggers**: Click − / + · Switch Eco / Comfort / Warm Glow
 - **Tokens**: `--ease-bounce: cubic-bezier(0.34, 1.36, 0.64, 1); --dur-dial: 280ms;`
-- **Preview**: https://17860288878k-debug.github.io/motion-lab/components.html#pulse-climate
+- **Preview**: https://hmkkaii.github.io/motion-lab/components.html#pulse-climate
 - **Summary**: Circular architectural thermostat with 36 precision ticks, glowing conic arc, stepper controls, and ambient mood switcher.
 
 #### CSS
@@ -1877,7 +1877,7 @@ if (id === "pulse-climate") {
 ### Orbit Live Flight Pass (`orbit-flight`)
 - **Category**: Cards | **Triggers**: Switch Live Route / Gate B14 / Boarding
 - **Tokens**: `--ease-smooth-out: cubic-bezier(0.22, 1, 0.36, 1); --dur-tab: 300ms;`
-- **Preview**: https://17860288878k-debug.github.io/motion-lab/components.html#orbit-flight
+- **Preview**: https://hmkkaii.github.io/motion-lab/components.html#orbit-flight
 - **Summary**: Cobalt aviation tracker with SVG great-circle flight path, pulsing radar plane indicator, and live boarding tab transition.
 
 #### CSS
@@ -2028,7 +2028,7 @@ else if (id === "orbit-flight") {
 ### Tempo Spatial Audio Deck (`tempo-audio`)
 - **Category**: Media | **Triggers**: Play / Pause · Switch Studio / Warm / Spatial
 - **Tokens**: `--dur-eq: 140ms; --ease-bounce: cubic-bezier(0.34, 1.36, 0.64, 1);`
-- **Preview**: https://17860288878k-debug.github.io/motion-lab/components.html#tempo-audio
+- **Preview**: https://hmkkaii.github.io/motion-lab/components.html#tempo-audio
 - **Summary**: Obsidian hi-fi vinyl player with 18-bar animated harmonic equalizer and color-shifting Studio / Warm / Spatial sound presets.
 
 #### CSS
@@ -2203,7 +2203,7 @@ else if (id === "tempo-audio") {
 ### Chroma Palette Studio (`chroma-mesh`)
 - **Category**: Creative | **Triggers**: Pick Swatch · Click Copy CSS
 - **Tokens**: `--dur-mesh: 420ms; --ease-smooth-out: cubic-bezier(0.22, 1, 0.36, 1);`
-- **Preview**: https://17860288878k-debug.github.io/motion-lab/components.html#chroma-mesh
+- **Preview**: https://hmkkaii.github.io/motion-lab/components.html#chroma-mesh
 - **Summary**: Multi-layer radial mesh gradient studio with crossfading Solstice / Cobalt / Matcha themes, live OKLCH readout, and one-click CSS copy.
 
 #### CSS
@@ -2344,7 +2344,7 @@ else if (id === "chroma-mesh") {
 ### Focus Deep Work Timer (`focus-timer`)
 - **Category**: Productivity | **Triggers**: Start / Pause Session · Toggle Ambient Sound Chips
 - **Tokens**: `--dur-ring: 320ms; --ease-smooth-out: cubic-bezier(0.22, 1, 0.36, 1);`
-- **Preview**: https://17860288878k-debug.github.io/motion-lab/components.html#focus-timer
+- **Preview**: https://hmkkaii.github.io/motion-lab/components.html#focus-timer
 - **Summary**: Warm-paper Pomodoro timer with smooth SVG countdown ring, tabular digits, and Rain / Vinyl / Forest ambient chips.
 
 #### CSS
@@ -2498,7 +2498,7 @@ else if (id === "focus-timer") {
 ### Forge Edge Deploy Pipeline (`forge-deploy`)
 - **Category**: Developer | **Triggers**: Click Deploy Release / Redeploy
 - **Tokens**: `--dur-step: 240ms; --stagger: 520ms; --ease-bounce: cubic-bezier(0.34, 1.36, 0.64, 1);`
-- **Preview**: https://17860288878k-debug.github.io/motion-lab/components.html#forge-deploy
+- **Preview**: https://hmkkaii.github.io/motion-lab/components.html#forge-deploy
 - **Summary**: Interactive deployment card that cascades through 4 staggered build stages with spring checkmarks and live edge latency status.
 
 #### CSS
@@ -2662,7 +2662,7 @@ else if (id === "forge-deploy") {
 ### Design Shelf 3D Deck (`shelf-books`)
 - **Category**: Media | **Triggers**: Click ‹ / › or Covers · Toggle Bookmark
 - **Tokens**: `--dur-deck: 360ms; --ease-bounce: cubic-bezier(0.34, 1.36, 0.64, 1);`
-- **Preview**: https://17860288878k-debug.github.io/motion-lab/components.html#shelf-books
+- **Preview**: https://hmkkaii.github.io/motion-lab/components.html#shelf-books
 - **Summary**: Tactile Swiss graphic book cover-flow with perspective depth stacking, synced reading progress bar, and spring bookmark toggle.
 
 #### CSS
@@ -2809,7 +2809,7 @@ else if (id === "shelf-books") {
 ### Relay Issue Triage Card (`relay-triage`)
 - **Category**: Productivity | **Triggers**: Toggle Priority · Click Ship PR · Toggle Reactions
 - **Tokens**: `--dur-micro: 160ms; --ease-bounce: cubic-bezier(0.34, 1.36, 0.64, 1);`
-- **Preview**: https://17860288878k-debug.github.io/motion-lab/components.html#relay-triage
+- **Preview**: https://hmkkaii.github.io/motion-lab/components.html#relay-triage
 - **Summary**: Linear-inspired engineering issue card with interactive priority escalation, Ship PR state morph, QA bar fill, and reaction toggles.
 
 #### CSS
