@@ -1,5 +1,7 @@
 # Motion Lab v2.0
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![Zero Dependency](https://img.shields.io/badge/Dependencies-0-brightgreen.svg)](#) [![MCP Ready](https://img.shields.io/badge/MCP%20%26%20Skill-Ready-7c6cff.svg)](https://hmkkaii.github.io/motion-lab/ai.html)
+
 **Building blocks for interactive UI, ready to use as a library, Agent Skill, or MCP server with Claude Code, Cursor, Codex, and Antigravity.**
 
 Zero-dependency semantic HTML, CSS custom properties, and Vanilla JavaScript — with live clickable previews, real-time parameter tuning, and machine-readable AI endpoints.
@@ -10,6 +12,10 @@ Zero-dependency semantic HTML, CSS custom properties, and Vanilla JavaScript —
 - **Machine Registry (`registry.json`)**: https://hmkkaii.github.io/motion-lab/registry.json
 - **LLM Index (`llms.txt`)**: https://hmkkaii.github.io/motion-lab/llms.txt
 - **Repository**: https://github.com/hmkkaii/motion-lab
+
+[![Motion Lab v2.0 — 12 Interactive Motion Studies & Parameter Workbench](assets/preview.png)](https://hmkkaii.github.io/motion-lab/)
+
+[![Motion Lab v2.0 — 8 Interactive Tactile UI Components](assets/preview-components.png)](https://hmkkaii.github.io/motion-lab/components.html)
 
 ---
 
