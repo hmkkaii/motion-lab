@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Skill &amp; MCP — Motion Lab</title>
+  <meta name="description" content="Connect Motion Lab's 12 motion studies, 8 interactive UI components, and easing tokens to Claude Code, Cursor, Codex, and Antigravity via llms.txt, Agent Skill, or zero-dependency MCP." />
+  <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg" />
+  <link rel="stylesheet" href="./assets/fonts/fonts.css?v=2.0.0" />
+  <link rel="stylesheet" href="./assets/css/design-system.css?v=2.0.0" />
+  <link rel="stylesheet" href="./assets/css/studies.css?v=2.0.0" />
+  <link rel="stylesheet" href="./assets/css/components.css?v=2.0.0" />
+</head>
+<body>
+  <header class="ml-header">
+    <div class="ml-container ml-header-inner">
+      <a class="ml-brand" href="./index.html" aria-label="Motion Lab Home">
+        <span class="ml-brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M4.5 18.5C10.5 18.5 9.5 5.5 19.5 5.5" stroke-width="2.4" stroke-linecap="round"/>
+            <circle cx="4.5" cy="18.5" r="2" fill="#5E8BFF"/>
+            <circle cx="19.5" cy="5.5" r="2" fill="#FFFFFF"/>
+          </svg>
+        </span>
+        <span>Motion Lab</span>
+        <span class="ml-brand-tag">v2.0</span>
+      </a>
+
+      <nav class="ml-nav" aria-label="Primary navigation">
+        <a class="ml-nav-link" href="./index.html">Studies</a>
+        <a class="ml-nav-link" href="./components.html">Components</a>
+        <a class="ml-nav-link" href="./study.html?id=adaptive-card">Workbench</a>
+        <a class="ml-nav-link" href="./tokens.html">Curve Lab</a>
+        <a class="ml-nav-link" href="./ai.html" aria-current="page">Skill &amp; MCP</a>
+        <a class="ml-nav-link" href="./about.html">About</a>
+      </nav>
+
+      <div class="ml-header-actions">
+        <button type="button" class="ml-icon-btn" data-theme-toggle aria-label="Switch theme">
+          <span data-theme-label>Dark</span>
+        </button>
+        <button type="button" class="ml-icon-btn ml-menu-btn" data-mobile-menu-btn aria-label="Toggle navigation menu" aria-expanded="false">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <path d="M3 6h14M3 10h14M3 14h14"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <nav class="ml-mobile-nav" data-mobile-nav aria-label="Mobile navigation">
+    <a class="ml-nav-link" href="./index.html">Studies</a>
+    <a class="ml-nav-link" href="./components.html">Components</a>
+    <a class="ml-nav-link" href="./study.html?id=adaptive-card">Workbench</a>
+    <a class="ml-nav-link" href="./tokens.html">Curve Lab</a>
+    <a class="ml-nav-link" href="./ai.html" aria-current="page">Skill &amp; MCP</a>
+    <a class="ml-nav-link" href="./about.html">About</a>
+  </nav>
+
+  <main class="ml-main">
+    <section class="ml-hero">
+      <div class="ml-container ml-hero-grid">
+        <div>
+          <div class="ml-eyebrow">
+            <span class="ml-eyebrow-dot" aria-hidden="true"></span>
+            <span>Built for Humans &amp; Coding Agents</span>
+          </div>
+          <h1>Use Motion Lab as a Library,<br/>Agent Skill, or MCP Server.</h1>
+          <p>
+            Give <strong>Claude Code</strong>, <strong>Cursor</strong>, <strong>Codex</strong>, or
+            <strong>Antigravity</strong> direct access to all 12 motion studies, 8 interactive UI
+            components, and 6 calibrated easing curves—via zero-install <code>llms.txt</code>,
+            structured <code>registry.json</code>, an installable <code>SKILL.md</code>, or a local
+            zero-dependency stdio MCP server (Python 3 or Node.js).
+          </p>
+          <div class="ml-endpoint-strip">
+            <a class="ml-btn ml-btn-primary" href="./llms.txt" target="_blank" rel="noopener">Open llms.txt ↗</a>
+            <a class="ml-btn" href="./registry.json" target="_blank" rel="noopener">Open registry.json ↗</a>
+            <a class="ml-btn" href="./llms-full.txt" target="_blank" rel="noopener">llms-full.txt ↗</a>
+            <a class="ml-btn" href="https://github.com/17860288878k-debug/motion-lab/blob/main/skills/motion-lab/SKILL.md" target="_blank" rel="noopener noreferrer">SKILL.md ↗</a>
+          </div>
+        </div>
+
+        <div class="ml-hero-metrics" aria-label="AI capabilities">
+          <div class="ml-metric">
+            <div class="ml-metric-val">20</div>
+            <div class="ml-metric-label">Live Blocks</div>
+          </div>
+          <div class="ml-metric">
+            <div class="ml-metric-val">5</div>
+            <div class="ml-metric-label">MCP Tools</div>
+          </div>
+          <div class="ml-metric">
+            <div class="ml-metric-val">0</div>
+            <div class="ml-metric-label">External Deps</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="ml-container" aria-label="Agent setup guides">
+      <div class="ml-ai-grid">
+        <!-- 1. Claude Code -->
+        <article class="ml-ai-card">
+          <div class="ml-ai-card-head">
+            <h2>1. Claude Code</h2>
+            <span class="ml-badge">Skill + MCP</span>
+          </div>
+          <p>
+            Clone the repo once, register the zero-dependency Python 3 (or Node.js) MCP server, and
+            symlink the Agent Skill so Claude Code applies Motion Lab tokens automatically.
+          </p>
+          <div class="ml-ai-subhead">
+            <span>Clone &amp; Add MCP (Python 3 — zero npm/pip install)</span>
+            <button type="button" class="ml-mini-btn is-accent" data-copy-target="code-claude" data-copy-label="Claude Code setup">Copy</button>
+          </div>
+          <pre class="ml-code-block" id="code-claude">git clone https://github.com/17860288878k-debug/motion-lab.git ~/motion-lab
+
+# Add zero-dependency Python 3 stdio MCP server
+claude mcp add motion-lab -- python3 ~/motion-lab/mcp/motion-lab-mcp.py
+
+# Or use Node.js (>= 18) instead:
+# claude mcp add motion-lab -- node ~/motion-lab/mcp/motion-lab-mcp.mjs
+
+# Optional: install Agent Skill globally
+mkdir -p ~/.claude/skills/motion-lab
+cp ~/motion-lab/skills/motion-lab/SKILL.md ~/.claude/skills/motion-lab/SKILL.md</pre>
+        </article>
+
+        <!-- 2. Cursor -->
+        <article class="ml-ai-card">
+          <div class="ml-ai-card-head">
+            <h2>2. Cursor</h2>
+            <span class="ml-badge">.cursor/mcp.json</span>
+          </div>
+          <p>
+            Drop this snippet into <code>.cursor/mcp.json</code> (project) or
+            <code>~/.cursor/mcp.json</code> (global) to call all 5 Motion Lab tools right from
+            Cursor Agent mode.
+          </p>
+          <div class="ml-ai-subhead">
+            <span>MCP Configuration (.cursor/mcp.json)</span>
+            <button type="button" class="ml-mini-btn is-accent" data-copy-target="code-cursor" data-copy-label="Cursor mcp.json">Copy</button>
+          </div>
+          <pre class="ml-code-block" id="code-cursor">{
+  "mcpServers": {
+    "motion-lab": {
+      "command": "python3",
+      "args": ["/ABSOLUTE/PATH/TO/motion-lab/mcp/motion-lab-mcp.py"]
+    }
+  }
+}</pre>
+        </article>
+
+        <!-- 3. Codex CLI -->
+        <article class="ml-ai-card">
+          <div class="ml-ai-card-head">
+            <h2>3. Codex CLI</h2>
+            <span class="ml-badge">config.toml + Skill</span>
+          </div>
+          <p>
+            Register Motion Lab in <code>~/.codex/config.toml</code> and install the skill under
+            <code>~/.codex/skills/motion-lab/SKILL.md</code>.
+          </p>
+          <div class="ml-ai-subhead">
+            <span>~/.codex/config.toml</span>
+            <button type="button" class="ml-mini-btn is-accent" data-copy-target="code-codex" data-copy-label="Codex config.toml">Copy</button>
+          </div>
+          <pre class="ml-code-block" id="code-codex">[mcp_servers.motion-lab]
+command = "python3"
+args = ["/ABSOLUTE/PATH/TO/motion-lab/mcp/motion-lab-mcp.py"]
+
+# Install Skill for Codex:
+# mkdir -p ~/.codex/skills/motion-lab
+# cp ~/motion-lab/skills/motion-lab/SKILL.md ~/.codex/skills/motion-lab/SKILL.md</pre>
+        </article>
+
+        <!-- 4. Zero-Install Direct Prompt -->
+        <article class="ml-ai-card">
+          <div class="ml-ai-card-head">
+            <h2>4. Zero-Install Web Prompt</h2>
+            <span class="ml-badge">llms.txt · registry.json</span>
+          </div>
+          <p>
+            No local install needed: paste this prompt into Claude, ChatGPT, Cursor, or Antigravity
+            so the agent fetches exact live CSS/JS code directly from GitHub Pages.
+          </p>
+          <div class="ml-ai-subhead">
+            <span>Ready-to-paste Agent Prompt</span>
+            <button type="button" class="ml-mini-btn is-accent" data-copy-target="code-prompt" data-copy-label="zero-install AI prompt">Copy</button>
+          </div>
+          <pre class="ml-code-block" id="code-prompt">Read https://17860288878k-debug.github.io/motion-lab/llms.txt and fetch https://17860288878k-debug.github.io/motion-lab/registry.json.
+
+Implement the "origin-menu" popover motion and the "pulse-climate" interactive dial in my project, preserving Motion Lab's exact cubic-bezier curves, asymmetric open/close durations, tabular-nums, and prefers-reduced-motion guards.</pre>
+        </article>
+      </div>
+    </section>
+
+    <section class="ml-container" style="margin-top:42px;" aria-label="MCP Tools & Resources">
+      <div class="ml-study-header" style="margin-bottom:14px;">
+        <div>
+          <span class="ml-badge">JSON-RPC 2.0 Stdio</span>
+          <h2 style="margin:6px 0 4px;font-size:24px;letter-spacing:-0.025em;">Available MCP Tools &amp; Resources</h2>
+          <p>Both <code>mcp/motion-lab-mcp.py</code> and <code>mcp/motion-lab-mcp.mjs</code> read live from <code>registry.json</code> (with automatic GitHub Pages fallback).</p>
+        </div>
+      </div>
+
+      <div class="ml-tool-grid">
+        <div class="ml-tool-card">
+          <div class="ml-tool-name">list_motions(category?)</div>
+          <p class="ml-tool-desc">Returns all 12 motion studies with specs, default easing curves, triggers, and Workbench URLs. Filter by Surfaces, Navigation, Feedback, or Micro-Motion.</p>
+        </div>
+        <div class="ml-tool-card">
+          <div class="ml-tool-name">get_motion_spec(id)</div>
+          <p class="ml-tool-desc">Returns complete CSS, Vanilla JS controller, tunable CSS variables, design rationale, and reduced-motion guard for any study slug.</p>
+        </div>
+        <div class="ml-tool-card">
+          <div class="ml-tool-name">list_components(category?)</div>
+          <p class="ml-tool-desc">Returns all 8 interactive UI components with triggers, motion tokens, and live preview URLs across 6 categories.</p>
+        </div>
+        <div class="ml-tool-card">
+          <div class="ml-tool-name">get_component_code(id)</div>
+          <p class="ml-tool-desc">Returns shared widget shell CSS, component CSS, and complete self-contained HTML/JS implementation for any of the 8 widgets.</p>
+        </div>
+        <div class="ml-tool-card">
+          <div class="ml-tool-name">get_easing_tokens()</div>
+          <p class="ml-tool-desc">Returns all 6 cubic-bezier curves, 7 semantic duration tokens, ready-to-paste <code>:root</code> CSS block, and 5 motion principles.</p>
+        </div>
+        <div class="ml-tool-card">
+          <div class="ml-tool-name">Resources (3 URIs)</div>
+          <p class="ml-tool-desc"><code>motion-lab://registry</code>, <code>motion-lab://tokens</code>, and <code>motion-lab://llms</code> for instant resource mounting in MCP clients.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="ml-footer">
+    <div class="ml-container ml-footer-inner">
+      <div><strong>Motion Lab v2.0</strong> — Interactive UI Components &amp; Motion Workbench.</div>
+      <div>
+        <a href="./llms.txt">llms.txt</a> ·
+        <a href="./registry.json">registry.json</a> ·
+        <a href="./components.html">Components</a> ·
+        <a href="./about.html">Licenses</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="./assets/js/app.js?v=2.0.0"></script>
+  <script src="./assets/js/ai-page.js?v=2.0.0"></script>
+</body>
+</html>

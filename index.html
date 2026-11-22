@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Motion Lab — Interactive UI Motion Playground</title>
-  <meta name="description" content="An independent interactive studio for experimenting with responsive UI transitions, easing curves, interruption physics, and live motion tokens." />
+  <title>Motion Lab — Interactive UI Motion &amp; Component Playground</title>
+  <meta name="description" content="Zero-dependency interactive UI motion studies (12), tactile UI components (8), and easing curves ready to use as a library, Agent Skill, or MCP server with Claude Code, Cursor, and Codex." />
   <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg" />
-  <link rel="stylesheet" href="./assets/fonts/fonts.css" />
-  <link rel="stylesheet" href="./assets/css/design-system.css" />
-  <link rel="stylesheet" href="./assets/css/studies.css" />
+  <link rel="stylesheet" href="./assets/fonts/fonts.css?v=2.0.0" />
+  <link rel="stylesheet" href="./assets/css/design-system.css?v=2.0.0" />
+  <link rel="stylesheet" href="./assets/css/studies.css?v=2.0.0" />
+  <link rel="stylesheet" href="./assets/css/components.css?v=2.0.0" />
 </head>
 <body>
   <header class="ml-header">
@@ -22,14 +23,16 @@
           </svg>
         </span>
         <span>Motion Lab</span>
-        <span class="ml-brand-tag">v1.0</span>
+        <span class="ml-brand-tag">v2.0</span>
       </a>
 
       <nav class="ml-nav" aria-label="Primary navigation">
         <a class="ml-nav-link" href="./index.html" aria-current="page">Studies</a>
+        <a class="ml-nav-link" href="./components.html">Components</a>
         <a class="ml-nav-link" href="./study.html?id=adaptive-card">Workbench</a>
         <a class="ml-nav-link" href="./tokens.html">Curve Lab</a>
-        <a class="ml-nav-link" href="./about.html">About &amp; Licenses</a>
+        <a class="ml-nav-link" href="./ai.html">Skill &amp; MCP</a>
+        <a class="ml-nav-link" href="./about.html">About</a>
       </nav>
 
       <div class="ml-header-actions">
@@ -47,9 +50,11 @@
 
   <nav class="ml-mobile-nav" data-mobile-nav aria-label="Mobile navigation">
     <a class="ml-nav-link" href="./index.html" aria-current="page">Studies</a>
+    <a class="ml-nav-link" href="./components.html">Components</a>
     <a class="ml-nav-link" href="./study.html?id=adaptive-card">Workbench</a>
     <a class="ml-nav-link" href="./tokens.html">Curve Lab</a>
-    <a class="ml-nav-link" href="./about.html">About &amp; Licenses</a>
+    <a class="ml-nav-link" href="./ai.html">Skill &amp; MCP</a>
+    <a class="ml-nav-link" href="./about.html">About</a>
   </nav>
 
   <main class="ml-main">
@@ -58,32 +63,34 @@
         <div>
           <div class="ml-eyebrow">
             <span class="ml-eyebrow-dot" aria-hidden="true"></span>
-            <span>Interactive UI Motion Playground</span>
+            <span>Interactive UI Building Blocks · Library, Skill &amp; MCP</span>
           </div>
           <h1>Feel every millisecond,<br/>curve, and interrupt.</h1>
           <p>
-            Motion Lab is an independent, hands-on craft bench for testing real CSS and JS interface
-            transitions. Click, hover, toggle, or interrupt any study directly below—or open its
-            dedicated Workbench to tune durations, easing curves, and slow-motion playback live.
+            Motion Lab is an independent, zero-dependency studio with <strong>12 live motion studies</strong>
+            and <strong>8 interactive UI components</strong>. Click, hover, interrupt, tune live parameters
+            in the Workbench, or connect it directly to <strong>Claude Code</strong>, <strong>Cursor</strong>,
+            and <strong>Codex</strong> via <code>llms.txt</code>, Agent Skill, or MCP.
           </p>
           <div class="ml-hero-actions">
             <a class="ml-btn ml-btn-primary" href="#studies">Explore 12 Studies</a>
-            <a class="ml-btn" href="./tokens.html">Compare Easing Curves</a>
+            <a class="ml-btn" href="./components.html">8 UI Components</a>
+            <a class="ml-btn" href="./ai.html">Skill &amp; MCP Setup</a>
           </div>
         </div>
 
         <div class="ml-hero-metrics" aria-label="Lab highlights">
           <div class="ml-metric">
-            <div class="ml-metric-val">12</div>
-            <div class="ml-metric-label">Live Studies</div>
+            <div class="ml-metric-val">20</div>
+            <div class="ml-metric-label">Live Blocks</div>
           </div>
           <div class="ml-metric">
-            <div class="ml-metric-val">60fps</div>
-            <div class="ml-metric-label">Pure CSS / JS</div>
+            <div class="ml-metric-val">6</div>
+            <div class="ml-metric-label">Easing Curves</div>
           </div>
           <div class="ml-metric">
-            <div class="ml-metric-val">0</div>
-            <div class="ml-metric-label">Backend Deps</div>
+            <div class="ml-metric-val">MCP</div>
+            <div class="ml-metric-label">AI Ready</div>
           </div>
         </div>
       </div>
@@ -110,19 +117,21 @@
   <footer class="ml-footer">
     <div class="ml-container ml-footer-inner">
       <div>
-        <strong>Motion Lab</strong> — Independent interactive UI motion workbench by <strong>kai</strong>.
+        <strong>Motion Lab v2.0</strong> — Independent interactive UI motion workbench by <strong>kai</strong>.
       </div>
       <div>
-        Built with zero-dependency HTML/CSS/JS ·
-        <a href="./about.html">Licenses &amp; Open-Source Attribution</a> ·
-        <a href="https://github.com/17860288878k-debug/motion-lab" target="_blank" rel="noopener noreferrer">Source on GitHub</a>
+        <a href="./llms.txt">llms.txt</a> ·
+        <a href="./registry.json">registry.json</a> ·
+        <a href="./ai.html">Skill &amp; MCP</a> ·
+        <a href="./about.html">Licenses</a> ·
+        <a href="https://github.com/17860288878k-debug/motion-lab" target="_blank" rel="noopener noreferrer">GitHub</a>
       </div>
     </div>
   </footer>
 
-  <script src="./assets/js/app.js"></script>
-  <script src="./assets/js/studies-data.js"></script>
-  <script src="./assets/js/studies-runtime.js"></script>
-  <script src="./assets/js/home.js"></script>
+  <script src="./assets/js/app.js?v=2.0.0"></script>
+  <script src="./assets/js/studies-data.js?v=2.0.0"></script>
+  <script src="./assets/js/studies-runtime.js?v=2.0.0"></script>
+  <script src="./assets/js/home.js?v=2.0.0"></script>
 </body>
 </html>

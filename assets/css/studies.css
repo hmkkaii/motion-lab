@@ -125,7 +125,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 112px;
 }
 
 .st-menu-btn {
@@ -488,8 +488,10 @@
 .st-banner[data-depth="1"] { z-index: 2; transform: translateY(-12px) scale(0.94); opacity: 0.72; filter: blur(0.6px); }
 .st-banner[data-depth="2"] { z-index: 1; transform: translateY(-22px) scale(0.88); opacity: 0.44; filter: blur(1.2px); }
 
-.st-stack-wrap:hover .st-banner[data-depth="1"] { transform: translateY(-50px) scale(1); opacity: 1; filter: blur(0); }
-.st-stack-wrap:hover .st-banner[data-depth="2"] { transform: translateY(-100px) scale(1); opacity: 1; filter: blur(0); }
+.st-stack-wrap:hover .st-banner[data-depth="1"],
+.st-stack-wrap.is-expanded .st-banner[data-depth="1"] { transform: translateY(-50px) scale(1); opacity: 1; filter: blur(0); }
+.st-stack-wrap:hover .st-banner[data-depth="2"],
+.st-stack-wrap.is-expanded .st-banner[data-depth="2"] { transform: translateY(-100px) scale(1); opacity: 1; filter: blur(0); }
 
 .st-banner.is-entering {
   transform: translateY(28px) scale(0.96) !important;

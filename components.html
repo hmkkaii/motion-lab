@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interactive UI Components — Motion Lab</title>
+  <meta name="description" content="8 original interactive UI components with live controls, tactile spring motion, and Copy-for-AI specs ready for Claude Code, Cursor, and Codex." />
+  <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg" />
+  <link rel="stylesheet" href="./assets/fonts/fonts.css?v=2.0.0" />
+  <link rel="stylesheet" href="./assets/css/design-system.css?v=2.0.0" />
+  <link rel="stylesheet" href="./assets/css/studies.css?v=2.0.0" />
+  <link rel="stylesheet" href="./assets/css/components.css?v=2.0.0" />
+</head>
+<body>
+  <header class="ml-header">
+    <div class="ml-container ml-header-inner">
+      <a class="ml-brand" href="./index.html" aria-label="Motion Lab Home">
+        <span class="ml-brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M4.5 18.5C10.5 18.5 9.5 5.5 19.5 5.5" stroke-width="2.4" stroke-linecap="round"/>
+            <circle cx="4.5" cy="18.5" r="2" fill="#5E8BFF"/>
+            <circle cx="19.5" cy="5.5" r="2" fill="#FFFFFF"/>
+          </svg>
+        </span>
+        <span>Motion Lab</span>
+        <span class="ml-brand-tag">v2.0</span>
+      </a>
+
+      <nav class="ml-nav" aria-label="Primary navigation">
+        <a class="ml-nav-link" href="./index.html">Studies</a>
+        <a class="ml-nav-link" href="./components.html" aria-current="page">Components</a>
+        <a class="ml-nav-link" href="./study.html?id=adaptive-card">Workbench</a>
+        <a class="ml-nav-link" href="./tokens.html">Curve Lab</a>
+        <a class="ml-nav-link" href="./ai.html">Skill &amp; MCP</a>
+        <a class="ml-nav-link" href="./about.html">About</a>
+      </nav>
+
+      <div class="ml-header-actions">
+        <button type="button" class="ml-icon-btn" data-theme-toggle aria-label="Switch theme">
+          <span data-theme-label>Dark</span>
+        </button>
+        <button type="button" class="ml-icon-btn ml-menu-btn" data-mobile-menu-btn aria-label="Toggle navigation menu" aria-expanded="false">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <path d="M3 6h14M3 10h14M3 14h14"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <nav class="ml-mobile-nav" data-mobile-nav aria-label="Mobile navigation">
+    <a class="ml-nav-link" href="./index.html">Studies</a>
+    <a class="ml-nav-link" href="./components.html" aria-current="page">Components</a>
+    <a class="ml-nav-link" href="./study.html?id=adaptive-card">Workbench</a>
+    <a class="ml-nav-link" href="./tokens.html">Curve Lab</a>
+    <a class="ml-nav-link" href="./ai.html">Skill &amp; MCP</a>
+    <a class="ml-nav-link" href="./about.html">About</a>
+  </nav>
+
+  <main class="ml-main">
+    <section class="ml-hero">
+      <div class="ml-container ml-hero-grid">
+        <div>
+          <div class="ml-eyebrow">
+            <span class="ml-eyebrow-dot" aria-hidden="true"></span>
+            <span>Interactive UI Building Blocks</span>
+          </div>
+          <h1>8 original components.<br/>Click every control live.</h1>
+          <p>
+            Every widget below is powered by zero-dependency HTML, CSS, and JavaScript. Adjust dials,
+            switch flight gates, play the harmonic equalizer, trigger edge deploys, or click
+            <strong>Copy for AI</strong> to drop any spec straight into Claude Code, Cursor, or Codex.
+          </p>
+          <div class="ml-hero-actions">
+            <a class="ml-btn ml-btn-primary" href="./ai.html">Install Skill &amp; MCP</a>
+            <a class="ml-btn" href="./registry.json" target="_blank" rel="noopener">View registry.json ↗</a>
+          </div>
+        </div>
+
+        <div class="ml-hero-metrics" aria-label="Component highlights">
+          <div class="ml-metric">
+            <div class="ml-metric-val">8</div>
+            <div class="ml-metric-label">Live Widgets</div>
+          </div>
+          <div class="ml-metric">
+            <div class="ml-metric-val">12</div>
+            <div class="ml-metric-label">Motion Studies</div>
+          </div>
+          <div class="ml-metric">
+            <div class="ml-metric-val">MCP</div>
+            <div class="ml-metric-label">AI Ready</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="ml-container" aria-label="Interactive component showcase">
+      <div class="ml-toolbar">
+        <div class="ml-filter-pills" id="ml-comp-filters" role="group" aria-label="Filter components by category"></div>
+        <span class="ml-card-spec" id="ml-comp-count">8 / 8</span>
+      </div>
+
+      <div class="ml-comp-grid" id="ml-components-grid"></div>
+    </section>
+  </main>
+
+  <footer class="ml-footer">
+    <div class="ml-container ml-footer-inner">
+      <div><strong>Motion Lab v2.0</strong> — Interactive UI Components &amp; Motion Workbench.</div>
+      <div>
+        <a href="./llms.txt">llms.txt</a> ·
+        <a href="./registry.json">registry.json</a> ·
+        <a href="./ai.html">Skill &amp; MCP</a> ·
+        <a href="./about.html">Licenses</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="./assets/js/app.js?v=2.0.0"></script>
+  <script src="./assets/js/components-data.js?v=2.0.0"></script>
+  <script src="./assets/js/components-runtime.js?v=2.0.0"></script>
+  <script src="./assets/js/components-page.js?v=2.0.0"></script>
+</body>
+</html>

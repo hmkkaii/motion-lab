@@ -4,10 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>About &amp; Licenses — Motion Lab</title>
-  <meta name="description" content="About Motion Lab, design independence statement, and third-party open-source attributions and licenses." />
+  <meta name="description" content="About Motion Lab v2.0, AI-ready Agent Skill &amp; MCP architecture, design independence statement, and third-party open-source attributions." />
   <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg" />
-  <link rel="stylesheet" href="./assets/fonts/fonts.css" />
-  <link rel="stylesheet" href="./assets/css/design-system.css" />
+  <link rel="stylesheet" href="./assets/fonts/fonts.css?v=2.0.0" />
+  <link rel="stylesheet" href="./assets/css/design-system.css?v=2.0.0" />
+  <link rel="stylesheet" href="./assets/css/components.css?v=2.0.0" />
 </head>
 <body>
   <header class="ml-header">
@@ -21,14 +22,16 @@
           </svg>
         </span>
         <span>Motion Lab</span>
-        <span class="ml-brand-tag">v1.0</span>
+        <span class="ml-brand-tag">v2.0</span>
       </a>
 
       <nav class="ml-nav" aria-label="Primary navigation">
         <a class="ml-nav-link" href="./index.html">Studies</a>
+        <a class="ml-nav-link" href="./components.html">Components</a>
         <a class="ml-nav-link" href="./study.html?id=adaptive-card">Workbench</a>
         <a class="ml-nav-link" href="./tokens.html">Curve Lab</a>
-        <a class="ml-nav-link" href="./about.html" aria-current="page">About &amp; Licenses</a>
+        <a class="ml-nav-link" href="./ai.html">Skill &amp; MCP</a>
+        <a class="ml-nav-link" href="./about.html" aria-current="page">About</a>
       </nav>
 
       <div class="ml-header-actions">
@@ -46,26 +49,30 @@
 
   <nav class="ml-mobile-nav" data-mobile-nav aria-label="Mobile navigation">
     <a class="ml-nav-link" href="./index.html">Studies</a>
+    <a class="ml-nav-link" href="./components.html">Components</a>
     <a class="ml-nav-link" href="./study.html?id=adaptive-card">Workbench</a>
     <a class="ml-nav-link" href="./tokens.html">Curve Lab</a>
-    <a class="ml-nav-link" href="./about.html" aria-current="page">About &amp; Licenses</a>
+    <a class="ml-nav-link" href="./ai.html">Skill &amp; MCP</a>
+    <a class="ml-nav-link" href="./about.html" aria-current="page">About</a>
   </nav>
 
   <main class="ml-main">
     <article class="ml-container ml-prose">
-      <span class="ml-badge">Independent Project</span>
+      <span class="ml-badge">Independent Project · v2.0</span>
       <h1>About Motion Lab</h1>
       <p>
-        <strong>Motion Lab</strong> is an independent, static web workbench created for hands-on
-        exploration of UI interaction physics: asymmetric open/close durations, decelerating curves,
-        mid-flight interruption handling, and reduced-motion accessibility.
+        <strong>Motion Lab</strong> is an independent, zero-dependency interactive UI motion
+        workbench and component library built for hands-on exploration of interaction physics:
+        asymmetric open/close durations, decelerating curves, mid-flight interruption handling,
+        and reduced-motion accessibility.
       </p>
 
-      <h2>Technical Architecture</h2>
+      <h2>What's Inside v2.0</h2>
       <ul>
-        <li>Zero runtime framework dependencies — pure semantic HTML, CSS custom properties, and Vanilla JavaScript.</li>
-        <li>100% relative asset &amp; route paths designed specifically for static subpath hosting (GitHub Pages).</li>
-        <li>Self-hosted open-source typography with zero external trackers or private backend dependencies.</li>
+        <li><strong>12 Interactive Motion Studies</strong> across Surfaces, Navigation, Feedback, and Micro-Motion with dedicated parameter Workbenches.</li>
+        <li><strong>8 Original Interactive UI Components</strong> (<code>Pulse</code>, <code>Orbit</code>, <code>Tempo</code>, <code>Chroma</code>, <code>Focus</code>, <code>Forge</code>, <code>Shelf</code>, <code>Relay</code>) with manual live controls.</li>
+        <li><strong>AI-Callable Discovery &amp; Tooling</strong>: static <code>llms.txt</code>, <code>llms-full.txt</code>, <code>registry.json</code>, an installable Agent Skill (<code>skills/motion-lab/SKILL.md</code>), and zero-dependency Python 3 + Node.js stdio MCP servers for Claude Code, Cursor, Codex, and Antigravity.</li>
+        <li>100% relative asset &amp; route paths designed for static subpath hosting (GitHub Pages) with self-hosted SIL OFL 1.1 typography and zero external trackers.</li>
       </ul>
 
       <h2>Third-Party Open-Source Attribution &amp; License Compliance</h2>
@@ -95,11 +102,16 @@
 
   <footer class="ml-footer">
     <div class="ml-container ml-footer-inner">
-      <div><strong>Motion Lab</strong> — Independent interactive UI motion workbench.</div>
-      <div><a href="./index.html">Back to Studies</a></div>
+      <div><strong>Motion Lab v2.0</strong> — Independent interactive UI motion workbench.</div>
+      <div>
+        <a href="./llms.txt">llms.txt</a> ·
+        <a href="./registry.json">registry.json</a> ·
+        <a href="./ai.html">Skill &amp; MCP</a> ·
+        <a href="./index.html">Back to Studies</a>
+      </div>
     </div>
   </footer>
 
-  <script src="./assets/js/app.js"></script>
+  <script src="./assets/js/app.js?v=2.0.0"></script>
 </body>
 </html>

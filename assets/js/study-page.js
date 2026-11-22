@@ -176,6 +176,38 @@
     });
   }
 
+  // Copy active CSS variables
+  const copyCssBtn = document.getElementById("btn-copy-css");
+  if (copyCssBtn) {
+    copyCssBtn.addEventListener("click", () => {
+      if (window.MotionLabApp) {
+        window.MotionLabApp.copyText(elTokens.textContent, `Copied ${study.id} CSS variables`);
+      }
+      logEvent("copied active CSS variables");
+    });
+  }
+
+  // Copy full AI prompt with live-tuned parameters
+  const copyAiBtn = document.getElementById("btn-copy-ai");
+  if (copyAiBtn) {
+    copyAiBtn.addEventListener("click", () => {
+      const prompt = [
+        `Implement Motion Lab study "${study.title}" (${study.id}) using these tuned CSS variables:`,
+        "",
+        elTokens.textContent,
+        "",
+        `Triggers: ${study.triggers}`,
+        `Design Rationale: ${study.notes}`,
+        `Reference spec & CSS/JS: https://17860288878k-debug.github.io/motion-lab/registry.json (or MCP tool get_motion_spec id="${study.id}").`,
+        `Requirements: preserve mid-flight interruption safety, keyboard accessibility, and prefers-reduced-motion compliance.`
+      ].join("\n");
+      if (window.MotionLabApp) {
+        window.MotionLabApp.copyText(prompt, `Copied "${study.title}" AI prompt`);
+      }
+      logEvent("copied AI implementation prompt");
+    });
+  }
+
   buildControls();
   logEvent(`mounted "${study.title}" workbench`);
 })();

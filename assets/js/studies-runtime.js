@@ -2,8 +2,14 @@
 (function () {
   "use strict";
 
+  function isReducedMotion(el) {
+    if (el && el.closest && el.closest(".ml-reduced-motion")) return true;
+    return Boolean(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  }
+
   function mountStudy(id, container, onEvent) {
     const emit = typeof onEvent === "function" ? onEvent : function () {};
+    const cleanups = [];
     container.innerHTML = "";
     let rootTarget = null;
     let triggerPrimary = function () {};
@@ -47,13 +53,35 @@
       const pop = container.querySelector("[data-target]");
       rootTarget = pop;
       let open = false;
-      function setOpen(next) {
+
+      function setOpen(next, reason) {
+        if (next === open) return;
         open = next;
         btn.setAttribute("aria-expanded", String(open));
-        pop.classList.toggle("is-open", open);
-        pop.classList.toggle("is-closing", !open);
-        emit(`origin-menu → ${open ? "open (250ms, scale 0.97→1)" : "close (150ms, scale 1→0.99)"}`);
+        const cs = getComputedStyle(pop);
+        const openDur = (pop.style.getPropertyValue("--s-open-dur") || cs.getPropertyValue("--s-open-dur") || "250ms").trim();
+        const closeDur = (pop.style.getPropertyValue("--s-close-dur") || cs.getPropertyValue("--s-close-dur") || "150ms").trim();
+        const preScale = (pop.style.getPropertyValue("--s-pre-scale") || cs.getPropertyValue("--s-pre-scale") || "0.97").trim();
+
+        if (open) {
+          // Ensure every open starts cleanly from tuned --s-pre-scale rather than stale .is-closing state
+          pop.classList.remove("is-closing");
+          void pop.offsetWidth;
+          pop.classList.add("is-open");
+          emit(`origin-menu → open (${openDur}, scale ${preScale}→1)`);
+        } else {
+          pop.classList.remove("is-open");
+          pop.classList.add("is-closing");
+          emit(`origin-menu → close (${reason ? `${reason}, ` : ""}${closeDur}, scale 1→0.99)`);
+        }
       }
+
+      pop.addEventListener("transitionend", (e) => {
+        if (!open && e.propertyName === "opacity") {
+          pop.classList.remove("is-closing");
+        }
+      });
+
       triggerPrimary = () => setOpen(!open);
       btn.addEventListener("click", (e) => { e.stopPropagation(); setOpen(!open); });
       pop.querySelectorAll("[data-item]").forEach((it) => {
@@ -61,11 +89,27 @@
           pop.querySelectorAll("[data-item]").forEach((x) => x.classList.remove("is-selected"));
           it.classList.add("is-selected");
           emit(`origin-menu selected "${it.dataset.item}"`);
-          setOpen(false);
+          setOpen(false, "selected");
         });
       });
-      container.addEventListener("click", (e) => {
-        if (open && !pop.contains(e.target) && !btn.contains(e.target)) setOpen(false);
+
+      const onDocClick = (e) => {
+        if (open && !pop.contains(e.target) && !btn.contains(e.target)) {
+          setOpen(false, "outside click");
+        }
+      };
+      const onDocKeydown = (e) => {
+        if (open && e.key === "Escape") {
+          e.preventDefault();
+          setOpen(false, "Escape");
+          btn.focus();
+        }
+      };
+      document.addEventListener("click", onDocClick);
+      document.addEventListener("keydown", onDocKeydown);
+      cleanups.push(() => {
+        document.removeEventListener("click", onDocClick);
+        document.removeEventListener("keydown", onDocKeydown);
       });
     }
 
@@ -89,17 +133,34 @@
       const veil = container.querySelector("[data-target]");
       rootTarget = veil;
       let open = false;
+
       function setOpen(next, reason) {
+        if (next === open) return;
         open = next;
         veil.classList.toggle("is-open", open);
         veil.setAttribute("aria-hidden", String(!open));
-        emit(`scale-dialog → ${open ? "open (250ms, 0.96→1)" : `close (${reason || "150ms"})`}`);
+        const cs = getComputedStyle(veil);
+        const openDur = (veil.style.getPropertyValue("--s-open-dur") || cs.getPropertyValue("--s-open-dur") || "250ms").trim();
+        const closeDur = (veil.style.getPropertyValue("--s-close-dur") || cs.getPropertyValue("--s-close-dur") || "150ms").trim();
+        const scale = (veil.style.getPropertyValue("--s-scale") || cs.getPropertyValue("--s-scale") || "0.96").trim();
+        emit(`scale-dialog → ${open ? `open (${openDur}, ${scale}→1)` : `close (${reason || closeDur})`}`);
       }
+
       triggerPrimary = () => setOpen(!open, "toggle");
       openBtn.addEventListener("click", () => setOpen(true));
       veil.querySelector("[data-close]").addEventListener("click", () => setOpen(false, "cancel"));
       veil.querySelector("[data-confirm]").addEventListener("click", () => setOpen(false, "confirmed"));
       veil.addEventListener("click", (e) => { if (e.target === veil) setOpen(false, "backdrop"); });
+
+      const onDocKeydown = (e) => {
+        if (open && e.key === "Escape") {
+          e.preventDefault();
+          setOpen(false, "Escape");
+          openBtn.focus();
+        }
+      };
+      document.addEventListener("keydown", onDocKeydown);
+      cleanups.push(() => document.removeEventListener("keydown", onDocKeydown));
     }
 
     else if (id === "sliding-tabs") {
@@ -145,6 +206,7 @@
       if (typeof ResizeObserver !== "undefined") {
         const ro = new ResizeObserver(() => positionPill(activeIdx, true));
         ro.observe(box);
+        cleanups.push(() => ro.disconnect());
       }
       triggerPrimary = () => select((activeIdx + 1) % tabs.length);
     }
@@ -239,13 +301,26 @@
         ["Snapshot tagged", "14s ago"]
       ];
       container.innerHTML = `
-        <div class="st-stack-wrap" data-target></div>
+        <div class="st-stack-wrap" data-target role="button" tabindex="0" aria-expanded="false" aria-label="Notification stack — hover or tap to expand"></div>
         <button type="button" class="st-trigger" data-push>Push Notice</button>
       `;
       const stack = container.querySelector("[data-target]");
       const pushBtn = container.querySelector("[data-push]");
       rootTarget = stack;
       let counter = 0;
+
+      function toggleExpand() {
+        const exp = stack.classList.toggle("is-expanded");
+        stack.setAttribute("aria-expanded", String(exp));
+        emit(`toast-stack → ${exp ? "expanded (tap toggle)" : "collapsed"}`);
+      }
+      stack.addEventListener("click", toggleExpand);
+      stack.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          toggleExpand();
+        }
+      });
 
       function addNotice(animate) {
         const pair = messages[counter % messages.length];
@@ -263,9 +338,8 @@
           }
         });
         if (animate) {
-          requestAnimationFrame(() => {
-            el.classList.remove("is-entering");
-          });
+          void el.offsetWidth;
+          el.classList.remove("is-entering");
           emit(`toast-stack → pushed "${pair[0]} #${counter}" (depth 0..2)`);
         }
       }
@@ -309,6 +383,7 @@
           emit("validation-shake → cleared on input");
         }
       });
+      cleanups.push(() => clearTimeout(revertTimer));
       triggerPrimary = triggerError;
     }
 
@@ -369,16 +444,17 @@
         countEl.textContent = String(count);
         clearTimeout(burstTimer);
         btn.classList.remove("is-bursting");
-        if (liked) {
+        if (liked && !isReducedMotion(container)) {
           void btn.offsetWidth;
           btn.classList.add("is-bursting");
           burstTimer = setTimeout(() => btn.classList.remove("is-bursting"), 650);
           emit(`spring-like → liked (${count}) + 9-particle burst`);
         } else {
-          emit(`spring-like → unliked (${count})`);
+          emit(`spring-like → ${liked ? `liked (${count}, reduced-motion)` : `unliked (${count})`}`);
         }
       }
       btn.addEventListener("click", toggleLike);
+      cleanups.push(() => clearTimeout(burstTimer));
       triggerPrimary = toggleLike;
     }
 
@@ -396,8 +472,13 @@
       let value = 1248;
 
       function update(delta) {
+        const nextValue = Math.max(0, value + delta);
+        if (nextValue === value) {
+          emit("drum-counter → already at floor (0)");
+          return;
+        }
         const prev = value.toLocaleString("en-US");
-        value = Math.max(0, value + delta);
+        value = nextValue;
         const next = value.toLocaleString("en-US");
         const dir = delta >= 0 ? 1 : -1;
         readout.style.setProperty("--dir", String(dir));
@@ -442,7 +523,7 @@
       container.innerHTML = `
         <div class="st-cluster-wrap" data-target>
           <div class="st-avatar-row" data-avatars>
-            ${initials.map((t, i) => `<div class="st-avatar" style="background:${colors[i]}" data-av="${i}">${t}</div>`).join("")}
+            ${initials.map((t, i) => `<div class="st-avatar" tabindex="0" role="button" aria-label="Avatar ${t}" style="background:${colors[i]}" data-av="${i}">${t}</div>`).join("")}
           </div>
           <div class="st-tilt-card" data-tilt>
             <div class="st-tilt-glare"></div>
@@ -458,8 +539,24 @@
       const avs = Array.from(row.querySelectorAll("[data-av]"));
       const tilt = wrap.querySelector("[data-tilt]");
       rootTarget = wrap;
+      let waveTimer = null;
+
+      function resetRest() {
+        avs.forEach((el) => {
+          el.style.setProperty("--shift", "0px");
+          el.style.setProperty("--scale", "1");
+        });
+        tilt.classList.remove("is-tilting");
+        tilt.style.setProperty("--rx", "0deg");
+        tilt.style.setProperty("--ry", "0deg");
+        tilt.style.setProperty("--go", "0");
+      }
 
       function setWave(activeIdx, isLeave) {
+        if (isReducedMotion(container)) {
+          resetRest();
+          return;
+        }
         const liftVal = parseFloat(getComputedStyle(wrap).getPropertyValue("--s-lift")) || -6;
         const ease = isLeave ? "var(--s-ease-out)" : "var(--s-ease-in)";
         avs.forEach((el, i) => {
@@ -481,6 +578,14 @@
           setWave(i, false);
           emit(`avatar-wave → hover index ${i} (${initials[i]})`);
         });
+        el.addEventListener("focus", () => setWave(i, false));
+        el.addEventListener("blur", () => setWave(null, true));
+        el.addEventListener("click", () => {
+          clearTimeout(waveTimer);
+          setWave(i, false);
+          waveTimer = setTimeout(() => setWave(null, true), 450);
+          emit(`avatar-wave → tap index ${i} (${initials[i]})`);
+        });
       });
       row.addEventListener("mouseleave", () => {
         setWave(null, true);
@@ -488,6 +593,10 @@
       });
 
       tilt.addEventListener("pointermove", (e) => {
+        if (isReducedMotion(container)) {
+          resetRest();
+          return;
+        }
         const r = tilt.getBoundingClientRect();
         const px = (e.clientX - r.left) / r.width;
         const py = (e.clientY - r.top) / r.height;
@@ -508,9 +617,16 @@
         emit("3d-tilt → smooth return to rest");
       });
 
+      cleanups.push(() => clearTimeout(waveTimer));
       triggerPrimary = () => {
+        clearTimeout(waveTimer);
+        if (isReducedMotion(container)) {
+          resetRest();
+          emit("hover-cluster → suppressed under Reduced Motion");
+          return;
+        }
         setWave(2, false);
-        setTimeout(() => setWave(null, true), 450);
+        waveTimer = setTimeout(() => setWave(null, true), 450);
       };
     }
 
@@ -520,10 +636,14 @@
       applyVar(name, val) {
         if (rootTarget) {
           rootTarget.style.setProperty(name, val);
-          // Also apply to nested tilt card when tuning hover-cluster return duration
           const nested = rootTarget.querySelector(".st-tilt-card");
           if (nested) nested.style.setProperty(name, val);
         }
+      },
+      destroy() {
+        cleanups.forEach((fn) => {
+          try { fn(); } catch (_) {}
+        });
       }
     };
   }

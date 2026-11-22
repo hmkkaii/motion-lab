@@ -94,6 +94,7 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow-x: clip;
   background: var(--ml-bg);
   color: var(--ml-ink);
   font-family: var(--ml-font-sans);
@@ -549,16 +550,25 @@ button {
   margin-top: auto;
   padding-top: 8px;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: 8px;
   border-top: 1px solid var(--ml-border);
+}
+
+.ml-card-foot-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .ml-card-spec {
   font-family: var(--ml-font-mono);
   font-size: 11px;
   color: var(--ml-ink-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .ml-open-link {
@@ -844,9 +854,22 @@ button {
   background: var(--ml-stage-bg);
   border: 1px solid var(--ml-border);
   padding: 4px;
+  overflow: hidden;
+}
+
+.ml-track-finish {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  width: 2px;
+  border-radius: 2px;
+  background: var(--ml-border-strong);
+  pointer-events: none;
 }
 
 .ml-track-puck {
+  position: relative;
+  z-index: 1;
   width: 26px;
   height: 26px;
   border-radius: 50%;
@@ -924,15 +947,18 @@ button {
   }
 }
 
-@media (max-width: 680px) {
-  .ml-container {
-    padding: 0 16px;
-  }
+@media (max-width: 860px) {
   .ml-nav {
     display: none;
   }
   .ml-menu-btn {
     display: inline-flex;
+  }
+}
+
+@media (max-width: 680px) {
+  .ml-container {
+    padding: 0 16px;
   }
   .ml-gallery {
     grid-template-columns: minmax(0, 1fr);
@@ -947,5 +973,9 @@ button {
   .ml-workbench-stage {
     min-height: 320px;
     padding: 18px;
+  }
+  .ml-search-wrap {
+    min-width: 0;
+    flex: 1 1 auto;
   }
 }

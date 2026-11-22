@@ -1,0 +1,2960 @@
+# Motion Lab v2.0 — Complete AI Reference
+
+- Live Site: https://17860288878k-debug.github.io/motion-lab/
+- Registry JSON: https://17860288878k-debug.github.io/motion-lab/registry.json
+- Repository: https://github.com/17860288878k-debug/motion-lab
+- Inventory: 12 interactive motion studies + 8 interactive UI components + 6 easing curves + 7 duration tokens (zero runtime dependencies).
+
+## Design Principles
+- Use asymmetric open/close durations (e.g., 250ms open / 150ms close) so UI feels snappy yet never abrupt.
+- Default to architectural smooth-out cubic-bezier(0.22, 1, 0.36, 1); reserve bounce/pop overshoot strictly for small tactile feedback.
+- Always support mid-flight interruption by transitioning CSS properties or clearing pending timers on re-trigger.
+- Respect prefers-reduced-motion: reduce on both CSS transitions/animations and JS pointer/timer effects.
+- Use tabular-nums (font-variant-numeric: tabular-nums) on animated counters, timers, temperatures, and percentages to prevent layout jitter.
+
+## Core CSS Tokens
+```css
+:root {
+  --ml-speed: 1;
+  --duration-stagger: 40ms;
+  --duration-micro: 80ms;
+  --duration-quick: 150ms;
+  --duration-fast: 250ms;
+  --duration-medium: 350ms;
+  --duration-slow: 400ms;
+  --duration-very-slow: 500ms;
+
+  --ease-smooth-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.36, 0.64, 1);
+  --ease-pop: cubic-bezier(0.34, 1.96, 0.64, 1);
+  --ease-bounce-strong: cubic-bezier(0.34, 3.85, 0.64, 1);
+  --ease-in-out: cubic-bezier(0.42, 0, 0.58, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+}
+```
+
+## Reduced-Motion Guard
+```css
+/* Reduced-motion guard (system preference OR workbench live simulator) */
+.ml-reduced-motion *,
+.ml-reduced-motion *::before,
+.ml-reduced-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+```
+
+---
+
+## 12 Interactive Motion Studies
+
+### Adaptive Card Resize (`adaptive-card`)
+- **Category**: Surfaces | **Spec**: 300ms · smooth-out | **Triggers**: Click / Mid-flight interrupt
+- **Default Easing**: `cubic-bezier(0.22, 1, 0.36, 1)`
+- **Workbench**: https://17860288878k-debug.github.io/motion-lab/study.html?id=adaptive-card
+- **Rationale**: Uses a decelerating smooth-out curve so layout changes feel responsive immediately on click and settle cleanly without bounce.
+
+#### CSS
+```css
+/* 1. Adaptive Card Resize */
+.st-resize-card {
+  --s-dur: 300ms;
+  --s-ease: var(--ease-smooth-out);
+  width: 232px;
+  height: 112px;
+  padding: 14px;
+  border-radius: 16px;
+  background: var(--ml-surface);
+  border: 1px solid var(--ml-border);
+  box-shadow: var(--ml-shadow-md);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow: hidden;
+  transition:
+    width calc(var(--s-dur) * var(--ml-speed)) var(--s-ease),
+    height calc(var(--s-dur) * var(--ml-speed)) var(--s-ease);
+}
+
+.st-resize-card.is-compact {
+  width: 162px;
+  height: 138px;
+}
+
+.st-resize-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.st-resize-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ml-success);
+}
+
+.st-bar {
+  height: 9px;
+  border-radius: 99px;
+  background: var(--ml-surface-subtle);
+}
+
+.st-bar.w80 { width: 80%; }
+.st-bar.w60 { width: 60%; }
+.st-bar.w92 { width: 92%; }
+.st-bar.w45 { width: 45%; }
+```
+
+#### JS Controller
+```js
+if (id === "adaptive-card") {
+      container.innerHTML = `
+        <div class="st-resize-card" data-target>
+          <div class="st-resize-head"><span>Release Build</span><span class="st-resize-dot"></span></div>
+          <div class="st-bar w92"></div>
+          <div class="st-bar w60"></div>
+          <div class="st-bar w80"></div>
+          <div class="st-bar w45"></div>
+        </div>
+        <button type="button" class="st-trigger" data-action>Toggle Size</button>
+      `;
+      const card = container.querySelector("[data-target]");
+      const btn = container.querySelector("[data-action]");
+      rootTarget = card;
+      triggerPrimary = () => {
+        const compact = card.classList.toggle("is-compact");
+        emit(`adaptive-card → ${compact ? "compact (162×138)" : "expanded (232×112)"}`);
+      };
+      btn.addEventListener("click", triggerPrimary);
+    }
+```
+
+### Origin-Aware Action Menu (`origin-menu`)
+- **Category**: Surfaces | **Spec**: 250ms in / 150ms out | **Triggers**: Click / Outside dismiss / Escape / Interrupt
+- **Default Easing**: `cubic-bezier(0.22, 1, 0.36, 1)`
+- **Workbench**: https://17860288878k-debug.github.io/motion-lab/study.html?id=origin-menu
+- **Rationale**: Transform origin locks to top-center so the surface expands from its button; closing is 100ms faster with softer scale (0.99) to stay out of the user's way.
+
+#### CSS
+```css
+/* 2. Origin-Aware Action Menu */
+.st-menu-anchor {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 112px;
+}
+
+.st-menu-btn {
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 10px;
+  border: 1px solid var(--ml-border-strong);
+  background: var(--ml-surface);
+  font-size: 13px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  box-shadow: var(--ml-shadow-sm);
+}
+
+.st-menu-pop {
+  --s-open-dur: 250ms;
+  --s-close-dur: 150ms;
+  --s-pre-scale: 0.97;
+  --s-close-scale: 0.99;
+  --s-ease: var(--ease-smooth-out);
+  position: absolute;
+  top: 44px;
+  width: 196px;
+  padding: 6px;
+  border-radius: 14px;
+  background: var(--ml-surface);
+  border: 1px solid var(--ml-border);
+  box-shadow: var(--ml-shadow-lg);
+  transform-origin: top center;
+  opacity: 0;
+  transform: translateY(-4px) scale(var(--s-pre-scale));
+  pointer-events: none;
+  transition:
+    opacity calc(var(--s-close-dur) * var(--ml-speed)) var(--s-ease),
+    transform calc(var(--s-close-dur) * var(--ml-speed)) var(--s-ease);
+}
+
+.st-menu-pop.is-open {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+  transition:
+    opacity calc(var(--s-open-dur) * var(--ml-speed)) var(--s-ease),
+    transform calc(var(--s-open-dur) * var(--ml-speed)) var(--s-ease);
+}
+
+.st-menu-pop.is-closing {
+  opacity: 0;
+  transform: translateY(-2px) scale(var(--s-close-scale));
+}
+
+.st-menu-item {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  padding: 8px 10px;
+  border-radius: 8px;
+  text-align: left;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.st-menu-item:hover {
+  background: var(--ml-surface-subtle);
+}
+
+.st-menu-item.is-selected {
+  color: var(--ml-accent);
+  font-weight: 600;
+}
+```
+
+#### JS Controller
+```js
+else if (id === "origin-menu") {
+      container.innerHTML = `
+        <div class="st-menu-anchor">
+          <button type="button" class="st-menu-btn" aria-expanded="false" data-menu-btn>
+            <span>Actions</span>
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6l4 4 4-4"/></svg>
+          </button>
+          <div class="st-menu-pop" role="menu" data-target>
+            <button type="button" class="st-menu-item is-selected" role="menuitem" data-item="Duplicate"><span>Duplicate</span><span>⌘D</span></button>
+            <button type="button" class="st-menu-item" role="menuitem" data-item="Inspect Tokens"><span>Inspect Tokens</span><span>⌘I</span></button>
+            <button type="button" class="st-menu-item" role="menuitem" data-item="Export Preset"><span>Export Preset</span><span>⌘E</span></button>
+          </div>
+        </div>
+      `;
+      const btn = container.querySelector("[data-menu-btn]");
+      const pop = container.querySelector("[data-target]");
+      rootTarget = pop;
+      let open = false;
+
+      function setOpen(next, reason) {
+        if (next === open) return;
+        open = next;
+        btn.setAttribute("aria-expanded", String(open));
+        const cs = getComputedStyle(pop);
+        const openDur = (pop.style.getPropertyValue("--s-open-dur") || cs.getPropertyValue("--s-open-dur") || "250ms").trim();
+        const closeDur = (pop.style.getPropertyValue("--s-close-dur") || cs.getPropertyValue("--s-close-dur") || "150ms").trim();
+        const preScale = (pop.style.getPropertyValue("--s-pre-scale") || cs.getPropertyValue("--s-pre-scale") || "0.97").trim();
+
+        if (open) {
+          // Ensure every open starts cleanly from tuned --s-pre-scale rather than stale .is-closing state
+          pop.classList.remove("is-closing");
+          void pop.offsetWidth;
+          pop.classList.add("is-open");
+          emit(`origin-menu → open (${openDur}, scale ${preScale}→1)`);
+        } else {
+          pop.classList.remove("is-open");
+          pop.classList.add("is-closing");
+          emit(`origin-menu → close (${reason ? `${reason}, ` : ""}${closeDur}, scale 1→0.99)`);
+        }
+      }
+
+      pop.addEventListener("transitionend", (e) => {
+        if (!open && e.propertyName === "opacity") {
+          pop.classList.remove("is-closing");
+        }
+      });
+
+      triggerPrimary = () => setOpen(!open);
+      btn.addEventListener("click", (e) => { e.stopPropagation(); setOpen(!open); });
+      pop.querySelectorAll("[data-item]").forEach((it) => {
+        it.addEventListener("click", () => {
+          pop.querySelectorAll("[data-item]").forEach((x) => x.classList.remove("is-selected"));
+          it.classList.add("is-selected");
+          emit(`origin-menu selected "${it.dataset.item}"`);
+          setOpen(false, "selected");
+        });
+      });
+
+      const onDocClick = (e) => {
+        if (open && !pop.contains(e.target) && !btn.contains(e.target)) {
+          setOpen(false, "outside click");
+        }
+      };
+      const onDocKeydown = (e) => {
+        if (open && e.key === "Escape") {
+          e.preventDefault();
+          setOpen(false, "Escape");
+          btn.focus();
+        }
+      };
+      document.addEventListener("click", onDocClick);
+      document.addEventListener("keydown", onDocKeydown);
+      cleanups.push(() => {
+        document.removeEventListener("click", onDocClick);
+        document.removeEventListener("keydown", onDocKeydown);
+      });
+    }
+```
+
+### Focal Scale Dialog (`scale-dialog`)
+- **Category**: Surfaces | **Spec**: 250ms in / 150ms out | **Triggers**: Click / Backdrop / Escape
+- **Default Easing**: `cubic-bezier(0.22, 1, 0.36, 1)`
+- **Workbench**: https://17860288878k-debug.github.io/motion-lab/study.html?id=scale-dialog
+- **Rationale**: Starting at 0.96 instead of 0.8 keeps focal modals crisp and architectural rather than cartoonish.
+
+#### CSS
+```css
+/* 3. Focal Scale Dialog */
+.st-dialog-wrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+}
+
+.st-dialog-veil {
+  --s-open-dur: 250ms;
+  --s-close-dur: 150ms;
+  --s-scale: 0.96;
+  --s-ease: var(--ease-smooth-out);
+  position: absolute;
+  inset: 0;
+  background: rgba(20, 22, 26, 0.24);
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity calc(var(--s-close-dur) * var(--ml-speed)) var(--s-ease);
+}
+
+.st-dialog-veil.is-open {
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity calc(var(--s-open-dur) * var(--ml-speed)) var(--s-ease);
+}
+
+.st-dialog-box {
+  width: 248px;
+  padding: 16px;
+  border-radius: 16px;
+  background: var(--ml-surface);
+  border: 1px solid var(--ml-border);
+  box-shadow: var(--ml-shadow-lg);
+  transform: scale(var(--s-scale));
+  opacity: 0;
+  transition:
+    transform calc(var(--s-close-dur) * var(--ml-speed)) var(--s-ease),
+    opacity calc(var(--s-close-dur) * var(--ml-speed)) var(--s-ease);
+}
+
+.st-dialog-veil.is-open .st-dialog-box {
+  transform: scale(1);
+  opacity: 1;
+  transition:
+    transform calc(var(--s-open-dur) * var(--ml-speed)) var(--s-ease),
+    opacity calc(var(--s-open-dur) * var(--ml-speed)) var(--s-ease);
+}
+
+.st-dialog-title {
+  margin: 0 0 6px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.st-dialog-body {
+  margin: 0 0 14px;
+  font-size: 12.5px;
+  color: var(--ml-ink-secondary);
+}
+
+.st-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+```
+
+#### JS Controller
+```js
+else if (id === "scale-dialog") {
+      container.innerHTML = `
+        <div class="st-dialog-wrap">
+          <button type="button" class="ml-btn ml-btn-primary" data-open>Open Dialog</button>
+          <div class="st-dialog-veil" data-target aria-hidden="true">
+            <div class="st-dialog-box" role="dialog" aria-modal="true" aria-label="Publish Snapshot">
+              <h3 class="st-dialog-title">Publish Snapshot?</h3>
+              <p class="st-dialog-body">Motion tokens will lock to this release preset and remain reversible.</p>
+              <div class="st-dialog-actions">
+                <button type="button" class="st-chip-btn" data-close>Cancel</button>
+                <button type="button" class="st-chip-btn" style="background:var(--ml-ink);color:var(--ml-bg);border-color:var(--ml-ink);" data-confirm>Confirm</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      const openBtn = container.querySelector("[data-open]");
+      const veil = container.querySelector("[data-target]");
+      rootTarget = veil;
+      let open = false;
+
+      function setOpen(next, reason) {
+        if (next === open) return;
+        open = next;
+        veil.classList.toggle("is-open", open);
+        veil.setAttribute("aria-hidden", String(!open));
+        const cs = getComputedStyle(veil);
+        const openDur = (veil.style.getPropertyValue("--s-open-dur") || cs.getPropertyValue("--s-open-dur") || "250ms").trim();
+        const closeDur = (veil.style.getPropertyValue("--s-close-dur") || cs.getPropertyValue("--s-close-dur") || "150ms").trim();
+        const scale = (veil.style.getPropertyValue("--s-scale") || cs.getPropertyValue("--s-scale") || "0.96").trim();
+        emit(`scale-dialog → ${open ? `open (${openDur}, ${scale}→1)` : `close (${reason || closeDur})`}`);
+      }
+
+      triggerPrimary = () => setOpen(!open, "toggle");
+      openBtn.addEventListener("click", () => setOpen(true));
+      veil.querySelector("[data-close]").addEventListener("click", () => setOpen(false, "cancel"));
+      veil.querySelector("[data-confirm]").addEventListener("click", () => setOpen(false, "confirmed"));
+      veil.addEventListener("click", (e) => { if (e.target === veil) setOpen(false, "backdrop"); });
+
+      const onDocKeydown = (e) => {
+        if (open && e.key === "Escape") {
+          e.preventDefault();
+          setOpen(false, "Escape");
+          openBtn.focus();
+        }
+      };
+      document.addEventListener("keydown", onDocKeydown);
+      cleanups.push(() => document.removeEventListener("keydown", onDocKeydown));
+    }
+```
+
+### Measured Sliding Tabs (`sliding-tabs`)
+- **Category**: Navigation | **Spec**: 250ms · measured pill | **Triggers**: Click / Rapid interrupt
+- **Default Easing**: `cubic-bezier(0.22, 1, 0.36, 1)`
+- **Workbench**: https://17860288878k-debug.github.io/motion-lab/study.html?id=sliding-tabs
+- **Rationale**: Measures offsetLeft and offsetWidth of the target button on click and on ResizeObserver, keeping transform and width synchronized.
+
+#### CSS
+```css
+/* 4. Measured Sliding Tabs */
+.st-tabs-box {
+  --s-dur: 250ms;
+  --s-ease: var(--ease-smooth-out);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.st-tabs-bar {
+  position: relative;
+  display: inline-flex;
+  padding: 4px;
+  border-radius: 12px;
+  background: var(--ml-surface-subtle);
+  border: 1px solid var(--ml-border);
+}
+
+.st-tabs-pill {
+  position: absolute;
+  top: 4px;
+  left: 0;
+  height: calc(100% - 8px);
+  border-radius: 8px;
+  background: var(--ml-surface);
+  box-shadow: var(--ml-shadow-sm);
+  transition:
+    transform calc(var(--s-dur) * var(--ml-speed)) var(--s-ease),
+    width calc(var(--s-dur) * var(--ml-speed)) var(--s-ease);
+}
+
+.st-tab-btn {
+  position: relative;
+  z-index: 1;
+  border: 0;
+  background: transparent;
+  padding: 7px 12px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ml-ink-secondary);
+  transition: color calc(var(--s-dur) * var(--ml-speed)) var(--s-ease);
+}
+
+.st-tab-btn[aria-selected="true"] {
+  color: var(--ml-ink);
+}
+
+.st-tabs-caption {
+  font-family: var(--ml-font-mono);
+  font-size: 11.5px;
+  color: var(--ml-ink-muted);
+}
+```
+
+#### JS Controller
+```js
+else if (id === "sliding-tabs") {
+      const tabs = ["Overview", "Curves", "Tokens", "Export"];
+      container.innerHTML = `
+        <div class="st-tabs-box" data-target>
+          <div class="st-tabs-bar" role="tablist">
+            <div class="st-tabs-pill" data-pill></div>
+            ${tabs.map((t, i) => `<button type="button" class="st-tab-btn" role="tab" aria-selected="${i === 0}" data-idx="${i}">${t}</button>`).join("")}
+          </div>
+          <div class="st-tabs-caption" data-cap>Active panel: Overview</div>
+        </div>
+      `;
+      const box = container.querySelector("[data-target]");
+      const pill = container.querySelector("[data-pill]");
+      const btns = Array.from(container.querySelectorAll("[role='tab']"));
+      const cap = container.querySelector("[data-cap]");
+      rootTarget = box;
+      let activeIdx = 0;
+
+      function positionPill(idx, instant) {
+        const b = btns[idx];
+        if (!b) return;
+        if (instant) pill.style.transition = "none";
+        pill.style.width = `${b.offsetWidth}px`;
+        pill.style.transform = `translateX(${b.offsetLeft}px)`;
+        if (instant) {
+          void pill.offsetWidth;
+          pill.style.transition = "";
+        }
+      }
+
+      function select(idx) {
+        activeIdx = idx;
+        btns.forEach((b, i) => b.setAttribute("aria-selected", String(i === idx)));
+        positionPill(idx, false);
+        cap.textContent = `Active panel: ${tabs[idx]}`;
+        emit(`sliding-tabs → "${tabs[idx]}" (x=${btns[idx].offsetLeft}px, w=${btns[idx].offsetWidth}px)`);
+      }
+
+      btns.forEach((b, i) => b.addEventListener("click", () => select(i)));
+      requestAnimationFrame(() => positionPill(0, true));
+      if (typeof ResizeObserver !== "undefined") {
+        const ro = new ResizeObserver(() => positionPill(activeIdx, true));
+        ro.observe(box);
+        cleanups.push(() => ro.disconnect());
+      }
+      triggerPrimary = () => select((activeIdx + 1) % tabs.length);
+    }
+```
+
+### Grid-Row Accordion (`accordion-disclosure`)
+- **Category**: Navigation | **Spec**: 250ms · 0fr ↔ 1fr | **Triggers**: Click / Toggle / Interrupt
+- **Default Easing**: `cubic-bezier(0.22, 1, 0.36, 1)`
+- **Workbench**: https://17860288878k-debug.github.io/motion-lab/study.html?id=accordion-disclosure
+- **Rationale**: Animates grid-template-rows from 0fr to 1fr without hardcoded max-height hacks, preserving exact content height.
+
+#### CSS
+```css
+/* 5. Grid-Row Accordion */
+.st-acc {
+  --s-dur: 250ms;
+  --s-ease: var(--ease-smooth-out);
+  width: 268px;
+  border-radius: 14px;
+  background: var(--ml-surface);
+  border: 1px solid var(--ml-border);
+  box-shadow: var(--ml-shadow-sm);
+  overflow: hidden;
+}
+
+.st-acc-item + .st-acc-item {
+  border-top: 1px solid var(--ml-border);
+}
+
+.st-acc-head {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.st-acc-chev {
+  width: 16px;
+  height: 16px;
+  color: var(--ml-ink-muted);
+  transition: transform calc(var(--s-dur) * var(--ml-speed)) var(--s-ease);
+}
+
+.st-acc-head[aria-expanded="true"] .st-acc-chev {
+  transform: scaleY(-1);
+}
+
+.st-acc-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows calc(var(--s-dur) * var(--ml-speed)) var(--s-ease);
+}
+
+.st-acc-panel.is-open {
+  grid-template-rows: 1fr;
+}
+
+.st-acc-inner {
+  overflow: hidden;
+}
+
+.st-acc-content {
+  padding: 0 14px 12px;
+  font-size: 12.5px;
+  color: var(--ml-ink-secondary);
+}
+```
+
+#### JS Controller
+```js
+else if (id === "accordion-disclosure") {
+      container.innerHTML = `
+        <div class="st-acc" data-target>
+          <div class="st-acc-item">
+            <button type="button" class="st-acc-head" aria-expanded="false" data-acc="0">
+              <span>Timing Guidelines</span>
+              <svg class="st-acc-chev" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6l4 4 4-4"/></svg>
+            </button>
+            <div class="st-acc-panel" data-panel="0">
+              <div class="st-acc-inner">
+                <div class="st-acc-content">Pair 250ms smooth-out opens with faster 150ms exits to keep UI crisp.</div>
+              </div>
+            </div>
+          </div>
+          <div class="st-acc-item">
+            <button type="button" class="st-acc-head" aria-expanded="false" data-acc="1">
+              <span>Reduced Motion</span>
+              <svg class="st-acc-chev" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6l4 4 4-4"/></svg>
+            </button>
+            <div class="st-acc-panel" data-panel="1">
+              <div class="st-acc-inner">
+                <div class="st-acc-content">All studies honor prefers-reduced-motion without breaking disclosure states.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      const acc = container.querySelector("[data-target]");
+      rootTarget = acc;
+      const heads = Array.from(acc.querySelectorAll("[data-acc]"));
+      const panels = Array.from(acc.querySelectorAll("[data-panel]"));
+
+      function toggle(i) {
+        const expanded = heads[i].getAttribute("aria-expanded") === "true";
+        heads[i].setAttribute("aria-expanded", String(!expanded));
+        panels[i].classList.toggle("is-open", !expanded);
+        emit(`accordion[${i}] → ${!expanded ? "expanded (1fr)" : "collapsed (0fr)"}`);
+      }
+      heads.forEach((h, i) => h.addEventListener("click", () => toggle(i)));
+      triggerPrimary = () => toggle(0);
+    }
+```
+
+### Directional View Slide (`page-transition`)
+- **Category**: Navigation | **Spec**: 250ms · ±10px + 3px blur | **Triggers**: Click Forward / Back
+- **Default Easing**: `cubic-bezier(0.22, 1, 0.36, 1)`
+- **Workbench**: https://17860288878k-debug.github.io/motion-lab/study.html?id=page-transition
+- **Rationale**: Short spatial displacement paired with mild blur communicates hierarchy direction without causing motion fatigue.
+
+#### CSS
+```css
+/* 6. Directional View Slide */
+.st-pager {
+  --s-dur: 250ms;
+  --s-dist: 10px;
+  --s-blur: 3px;
+  --s-ease: var(--ease-smooth-out);
+  position: relative;
+  width: 254px;
+  height: 158px;
+  border-radius: 16px;
+  background: var(--ml-surface);
+  border: 1px solid var(--ml-border);
+  box-shadow: var(--ml-shadow-md);
+  overflow: hidden;
+}
+
+.st-page {
+  position: absolute;
+  inset: 0;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition:
+    transform calc(var(--s-dur) * var(--ml-speed)) var(--s-ease),
+    opacity calc(var(--s-dur) * var(--ml-speed)) var(--s-ease),
+    filter calc(var(--s-dur) * var(--ml-speed)) var(--s-ease);
+}
+
+.st-page.is-left {
+  transform: translateX(calc(var(--s-dist) * -1));
+  opacity: 0;
+  filter: blur(var(--s-blur));
+  pointer-events: none;
+}
+
+.st-page.is-right {
+  transform: translateX(var(--s-dist));
+  opacity: 0;
+  filter: blur(var(--s-blur));
+  pointer-events: none;
+}
+
+.st-page.is-active {
+  transform: translateX(0);
+  opacity: 1;
+  filter: blur(0);
+  pointer-events: auto;
+}
+
+.st-page-row {
+  width: 100%;
+  border: 1px solid var(--ml-border);
+  background: var(--ml-bg);
+  border-radius: 10px;
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12.5px;
+  font-weight: 500;
+}
+
+.st-page-row:hover {
+  border-color: var(--ml-accent);
+}
+```
+
+#### JS Controller
+```js
+else if (id === "page-transition") {
+      container.innerHTML = `
+        <div class="st-pager" data-target>
+          <div class="st-page is-active" data-p1>
+            <div style="font-size:11.5px;font-weight:700;color:var(--ml-ink-muted);text-transform:uppercase;letter-spacing:.04em;">Workspaces</div>
+            <button type="button" class="st-page-row" data-go="Motion Core"><span>Motion Core</span><span>→</span></button>
+            <button type="button" class="st-page-row" data-go="Mobile Kit"><span>Mobile Kit</span><span>→</span></button>
+          </div>
+          <div class="st-page is-right" data-p2>
+            <button type="button" class="st-chip-btn" style="align-self:flex-start;" data-back>← Back</button>
+            <div style="font-size:15px;font-weight:700;margin-top:4px;" data-detail-title>Motion Core</div>
+            <div style="font-size:12px;color:var(--ml-ink-secondary);">Directional translateX + 3px cross-blur preserves spatial context.</div>
+          </div>
+        </div>
+      `;
+      const pager = container.querySelector("[data-target]");
+      const p1 = pager.querySelector("[data-p1]");
+      const p2 = pager.querySelector("[data-p2]");
+      const titleEl = pager.querySelector("[data-detail-title]");
+      rootTarget = pager;
+      let page = 1;
+
+      function goForward(label) {
+        if (label) titleEl.textContent = label;
+        page = 2;
+        p1.className = "st-page is-left";
+        p2.className = "st-page is-active";
+        emit(`page-transition → forward to "${titleEl.textContent}"`);
+      }
+      function goBack() {
+        page = 1;
+        p1.className = "st-page is-active";
+        p2.className = "st-page is-right";
+        emit("page-transition → back to Workspaces");
+      }
+      pager.querySelectorAll("[data-go]").forEach((b) => b.addEventListener("click", () => goForward(b.dataset.go)));
+      pager.querySelector("[data-back]").addEventListener("click", goBack);
+      triggerPrimary = () => (page === 1 ? goForward("Motion Core") : goBack());
+    }
+```
+
+### Stacked Notification Banners (`toast-stack`)
+- **Category**: Feedback | **Spec**: 350ms in · Hover/Tap fan-out | **Triggers**: Click Push / Hover or Tap spread
+- **Default Easing**: `cubic-bezier(0.22, 1, 0.36, 1)`
+- **Workbench**: https://17860288878k-debug.github.io/motion-lab/study.html?id=toast-stack
+- **Rationale**: Receding cards scale down by 6% per layer with progressive opacity and blur, then unfold cleanly into a full list on hover or mobile tap.
+
+#### CSS
+```css
+/* 7. Stacked Notification Banners */
+.st-stack-wrap {
+  --s-open: 350ms;
+  --s-close: 250ms;
+  --s-ease: var(--ease-smooth-out);
+  position: relative;
+  width: 248px;
+  height: 136px;
+  margin-bottom: 24px;
+}
+
+.st-banner {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 11px 13px;
+  border-radius: 13px;
+  background: var(--ml-surface);
+  border: 1px solid var(--ml-border);
+  box-shadow: var(--ml-shadow-md);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12.5px;
+  transform-origin: bottom center;
+  transition:
+    transform calc(var(--s-open) * var(--ml-speed)) var(--s-ease),
+    opacity calc(var(--s-open) * var(--ml-speed)) var(--s-ease),
+    filter calc(var(--s-open) * var(--ml-speed)) var(--s-ease);
+}
+
+.st-banner[data-depth="0"] { z-index: 3; transform: translateY(0) scale(1); opacity: 1; filter: blur(0); }
+.st-banner[data-depth="1"] { z-index: 2; transform: translateY(-12px) scale(0.94); opacity: 0.72; filter: blur(0.6px); }
+.st-banner[data-depth="2"] { z-index: 1; transform: translateY(-22px) scale(0.88); opacity: 0.44; filter: blur(1.2px); }
+
+.st-stack-wrap:hover .st-banner[data-depth="1"],
+.st-stack-wrap.is-expanded .st-banner[data-depth="1"] { transform: translateY(-50px) scale(1); opacity: 1; filter: blur(0); }
+.st-stack-wrap:hover .st-banner[data-depth="2"],
+.st-stack-wrap.is-expanded .st-banner[data-depth="2"] { transform: translateY(-100px) scale(1); opacity: 1; filter: blur(0); }
+
+.st-banner.is-entering {
+  transform: translateY(28px) scale(0.96) !important;
+  opacity: 0 !important;
+  filter: blur(2px) !important;
+}
+```
+
+#### JS Controller
+```js
+else if (id === "toast-stack") {
+      const messages = [
+        ["Build synced", "Just now"],
+        ["Preset saved", "2s ago"],
+        ["Curve exported", "8s ago"],
+        ["Snapshot tagged", "14s ago"]
+      ];
+      container.innerHTML = `
+        <div class="st-stack-wrap" data-target role="button" tabindex="0" aria-expanded="false" aria-label="Notification stack — hover or tap to expand"></div>
+        <button type="button" class="st-trigger" data-push>Push Notice</button>
+      `;
+      const stack = container.querySelector("[data-target]");
+      const pushBtn = container.querySelector("[data-push]");
+      rootTarget = stack;
+      let counter = 0;
+
+      function toggleExpand() {
+        const exp = stack.classList.toggle("is-expanded");
+        stack.setAttribute("aria-expanded", String(exp));
+        emit(`toast-stack → ${exp ? "expanded (tap toggle)" : "collapsed"}`);
+      }
+      stack.addEventListener("click", toggleExpand);
+      stack.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          toggleExpand();
+        }
+      });
+
+      function addNotice(animate) {
+        const pair = messages[counter % messages.length];
+        counter++;
+        const el = document.createElement("div");
+        el.className = animate ? "st-banner is-entering" : "st-banner";
+        el.innerHTML = `<strong>${pair[0]} #${counter}</strong><span style="color:var(--ml-ink-muted);font-size:11.5px;">${pair[1]}</span>`;
+        stack.prepend(el);
+        const items = Array.from(stack.children);
+        items.forEach((child, idx) => {
+          if (idx > 2) {
+            child.remove();
+          } else {
+            child.setAttribute("data-depth", String(idx));
+          }
+        });
+        if (animate) {
+          void el.offsetWidth;
+          el.classList.remove("is-entering");
+          emit(`toast-stack → pushed "${pair[0]} #${counter}" (depth 0..2)`);
+        }
+      }
+      addNotice(false);
+      addNotice(false);
+      triggerPrimary = () => addNotice(true);
+      pushBtn.addEventListener("click", triggerPrimary);
+    }
+```
+
+### Segmented Validation Shake (`validation-shake`)
+- **Category**: Feedback | **Spec**: 280ms shake · 3s auto-revert | **Triggers**: Click / Auto-revert / Input
+- **Default Easing**: `cubic-bezier(0.22, 1, 0.36, 1)`
+- **Workbench**: https://17860288878k-debug.github.io/motion-lab/study.html?id=validation-shake
+- **Rationale**: Decaying horizontal oscillations mimic physical rejection while automatically clearing transient error highlights once acknowledged.
+
+#### CSS
+```css
+/* 8. Segmented Validation Shake */
+.st-shake-form {
+  --s-dist: 6px;
+  --s-dur: 280ms;
+  --s-ease: var(--ease-smooth-out);
+  width: 244px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-bottom: 24px;
+}
+
+.st-shake-input {
+  width: 100%;
+  height: 38px;
+  padding: 0 12px;
+  border-radius: 10px;
+  border: 1.5px solid var(--ml-border-strong);
+  background: var(--ml-surface);
+  font-size: 13px;
+  transition: border-color 220ms var(--s-ease), box-shadow 220ms var(--s-ease);
+}
+
+.st-shake-form.is-error .st-shake-input {
+  border-color: var(--ml-danger);
+  box-shadow: 0 0 0 3px var(--ml-danger-soft);
+}
+
+.st-shake-form.is-shaking .st-shake-input {
+  animation: ml-shake calc(var(--s-dur) * var(--ml-speed)) var(--s-ease);
+}
+
+.st-shake-msg {
+  font-size: 12px;
+  color: var(--ml-danger);
+  min-height: 18px;
+  opacity: 0;
+  transform: translateY(-3px);
+  transition: opacity 200ms var(--s-ease), transform 200ms var(--s-ease);
+}
+
+.st-shake-form.is-error .st-shake-msg {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@keyframes ml-shake {
+  0%, 100% { transform: translateX(0); }
+  22% { transform: translateX(calc(var(--s-dist) * -1)); }
+  48% { transform: translateX(var(--s-dist)); }
+  74% { transform: translateX(calc(var(--s-dist) * -0.65)); }
+  90% { transform: translateX(calc(var(--s-dist) * 0.35)); }
+}
+```
+
+#### JS Controller
+```js
+else if (id === "validation-shake") {
+      container.innerHTML = `
+        <div class="st-shake-form" data-target>
+          <input type="text" class="st-shake-input" value="hello@motion" aria-label="Email preview" data-inp />
+          <div class="st-shake-msg" role="alert">Please enter a complete email address.</div>
+        </div>
+        <button type="button" class="st-trigger" data-action>Validate Invalid</button>
+      `;
+      const form = container.querySelector("[data-target]");
+      const inp = form.querySelector("[data-inp]");
+      const btn = container.querySelector("[data-action]");
+      rootTarget = form;
+      let revertTimer = null;
+
+      function triggerError() {
+        clearTimeout(revertTimer);
+        form.classList.remove("is-shaking");
+        void form.offsetWidth;
+        form.classList.add("is-error", "is-shaking");
+        emit("validation-shake → error shake triggered (auto-reverts in 3s)");
+        revertTimer = setTimeout(() => {
+          form.classList.remove("is-error", "is-shaking");
+          emit("validation-shake → auto-reverted to neutral");
+        }, 3000);
+      }
+
+      btn.addEventListener("click", triggerError);
+      inp.addEventListener("input", () => {
+        if (form.classList.contains("is-error")) {
+          clearTimeout(revertTimer);
+          form.classList.remove("is-error", "is-shaking");
+          emit("validation-shake → cleared on input");
+        }
+      });
+      cleanups.push(() => clearTimeout(revertTimer));
+      triggerPrimary = triggerError;
+    }
+```
+
+### Composed Success Check (`confirm-check`)
+- **Category**: Feedback | **Spec**: 500ms · 80ms stroke delay | **Triggers**: Click Replay / Reset
+- **Default Easing**: `cubic-bezier(0.22, 1, 0.36, 1)`
+- **Workbench**: https://17860288878k-debug.github.io/motion-lab/study.html?id=confirm-check
+- **Rationale**: Delaying the SVG checkmark stroke by 80ms lets the circular badge establish presence before the tick draws itself.
+
+#### CSS
+```css
+/* 9. Composed Success Check */
+.st-check-wrap {
+  --s-dur: 500ms;
+  --s-delay: 80ms;
+  --s-ease: var(--ease-smooth-out);
+  width: 68px;
+  height: 68px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 24px;
+}
+
+.st-check-circle {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--ml-success);
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 12px 26px -8px color-mix(in srgb, var(--ml-success) 55%, transparent);
+  opacity: 0;
+  transform: translateY(28px) rotate(65deg) scale(0.8);
+  filter: blur(8px);
+}
+
+.st-check-wrap.is-in .st-check-circle {
+  animation:
+    ml-check-fade calc(var(--s-dur) * var(--ml-speed)) var(--s-ease) forwards,
+    ml-check-bob calc(var(--s-dur) * var(--ml-speed)) var(--ease-bounce) forwards;
+}
+
+.st-check-path {
+  stroke-dasharray: 42;
+  stroke-dashoffset: 42;
+}
+
+.st-check-wrap.is-in .st-check-path {
+  animation: ml-check-draw calc(var(--s-dur) * var(--ml-speed)) var(--s-ease) calc(var(--s-delay) * var(--ml-speed)) forwards;
+}
+
+@keyframes ml-check-fade {
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+@keyframes ml-check-bob {
+  to {
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+}
+
+@keyframes ml-check-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+```
+
+#### JS Controller
+```js
+else if (id === "confirm-check") {
+      container.innerHTML = `
+        <div class="st-check-wrap is-in" data-target>
+          <div class="st-check-circle">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+              <path class="st-check-path" d="M5 13l4 4L19 7"/>
+            </svg>
+          </div>
+        </div>
+        <button type="button" class="st-trigger" data-action>Replay Check</button>
+      `;
+      const wrap = container.querySelector("[data-target]");
+      const btn = container.querySelector("[data-action]");
+      rootTarget = wrap;
+
+      function replay() {
+        wrap.classList.remove("is-in");
+        void wrap.offsetWidth;
+        wrap.classList.add("is-in");
+        emit("confirm-check → replayed 5-track check animation");
+      }
+      btn.addEventListener("click", replay);
+      triggerPrimary = replay;
+    }
+```
+
+### Spring Heart & Particle Burst (`spring-like`)
+- **Category**: Micro-Motion | **Spec**: 350ms pop · 600ms burst | **Triggers**: Click / Double-click safe
+- **Default Easing**: `cubic-bezier(0.34, 1.96, 0.64, 1)`
+- **Workbench**: https://17860288878k-debug.github.io/motion-lab/study.html?id=spring-like
+- **Rationale**: Asymmetry applies to micro-feedback too: liking celebrates with particles and overshoot while unliking stays quiet and immediate.
+
+#### CSS
+```css
+/* 10. Spring Heart & Particle Burst */
+.st-like-btn {
+  --s-pop: 350ms;
+  --s-particle: 600ms;
+  --s-ease: var(--ease-pop);
+  position: relative;
+  height: 44px;
+  padding: 0 18px;
+  border-radius: 999px;
+  border: 1px solid var(--ml-border-strong);
+  background: var(--ml-surface);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: var(--ml-shadow-sm);
+  transition: border-color 150ms ease, color 150ms ease;
+}
+
+.st-like-btn[aria-pressed="true"] {
+  border-color: color-mix(in srgb, var(--ml-like) 40%, transparent);
+  color: var(--ml-like);
+}
+
+.st-like-heart {
+  width: 18px;
+  height: 18px;
+  fill: transparent;
+  stroke: currentColor;
+  stroke-width: 2;
+  transition: fill 150ms ease, stroke 150ms ease;
+}
+
+.st-like-btn[aria-pressed="true"] .st-like-heart {
+  fill: var(--ml-like);
+  stroke: var(--ml-like);
+}
+
+.st-like-btn.is-bursting .st-like-heart {
+  animation: ml-like-pop calc(var(--s-pop) * var(--ml-speed)) var(--s-ease);
+}
+
+.st-particle {
+  position: absolute;
+  left: 26px;
+  top: 50%;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--ml-like);
+  pointer-events: none;
+  opacity: 0;
+}
+
+.st-like-btn.is-bursting .st-particle {
+  animation: ml-particle-burst calc(var(--s-particle) * var(--ml-speed)) var(--ease-smooth-out) forwards;
+}
+
+@keyframes ml-like-pop {
+  0% { transform: scale(0.8); }
+  55% { transform: scale(1.24); }
+  100% { transform: scale(1); }
+}
+
+@keyframes ml-particle-burst {
+  0% { opacity: 1; transform: translate(0, 0) scale(0.5); }
+  40% { opacity: 1; transform: translate(calc(var(--px) * 0.55), calc(var(--py) * 0.55)) scale(1.1); }
+  100% { opacity: 0; transform: translate(var(--px), var(--py)) scale(0.2); }
+}
+```
+
+#### JS Controller
+```js
+else if (id === "spring-like") {
+      const angles = Array.from({ length: 9 }, (_, i) => (i * 40) * Math.PI / 180);
+      const particles = angles.map((a) => {
+        const r = 24;
+        const px = (Math.cos(a) * r).toFixed(1) + "px";
+        const py = (Math.sin(a) * r).toFixed(1) + "px";
+        return `<span class="st-particle" style="--px:${px};--py:${py}"></span>`;
+      }).join("");
+
+      container.innerHTML = `
+        <button type="button" class="st-like-btn" aria-pressed="false" data-target>
+          ${particles}
+          <svg class="st-like-heart" viewBox="0 0 24 24">
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+          </svg>
+          <span data-count>42</span>
+        </button>
+      `;
+      const btn = container.querySelector("[data-target]");
+      const countEl = btn.querySelector("[data-count]");
+      rootTarget = btn;
+      let liked = false;
+      let count = 42;
+      let burstTimer = null;
+
+      function toggleLike() {
+        liked = !liked;
+        count += liked ? 1 : -1;
+        btn.setAttribute("aria-pressed", String(liked));
+        countEl.textContent = String(count);
+        clearTimeout(burstTimer);
+        btn.classList.remove("is-bursting");
+        if (liked && !isReducedMotion(container)) {
+          void btn.offsetWidth;
+          btn.classList.add("is-bursting");
+          burstTimer = setTimeout(() => btn.classList.remove("is-bursting"), 650);
+          emit(`spring-like → liked (${count}) + 9-particle burst`);
+        } else {
+          emit(`spring-like → ${liked ? `liked (${count}, reduced-motion)` : `unliked (${count})`}`);
+        }
+      }
+      btn.addEventListener("click", toggleLike);
+      cleanups.push(() => clearTimeout(burstTimer));
+      triggerPrimary = toggleLike;
+    }
+```
+
+### 3D Drum Counter (`drum-counter`)
+- **Category**: Micro-Motion | **Spec**: 520ms · 40ms stagger | **Triggers**: Click +12 / +135 / -24
+- **Default Easing**: `cubic-bezier(0.34, 1.36, 0.64, 1)`
+- **Workbench**: https://17860288878k-debug.github.io/motion-lab/study.html?id=drum-counter
+- **Rationale**: Direction follows value sign (+ rises from below, - drops from above) and tabular numerals prevent horizontal layout jitter.
+
+#### CSS
+```css
+/* 11. 3D Drum Counter */
+.st-counter-readout {
+  --s-dur: 520ms;
+  --s-stagger: 40ms;
+  --s-blur: 2.5px;
+  --s-ease: var(--ease-bounce);
+  display: inline-flex;
+  align-items: baseline;
+  font-size: 40px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 28px;
+}
+
+.st-digit-slot {
+  position: relative;
+  display: inline-block;
+  overflow: visible;
+}
+
+.st-digit-old {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  animation: ml-digit-out calc(var(--s-dur) * 0.36 * var(--ml-speed)) var(--ease-smooth-out) forwards;
+}
+
+.st-digit-new {
+  display: inline-block;
+  animation: ml-digit-in calc(var(--s-dur) * var(--ml-speed)) var(--s-ease) var(--stagger-d, 0ms) both;
+}
+
+@keyframes ml-digit-out {
+  to {
+    transform: translateY(calc(-0.46em * var(--dir, 1))) scale(0.75);
+    opacity: 0;
+    filter: blur(var(--s-blur));
+  }
+}
+
+@keyframes ml-digit-in {
+  from {
+    transform: translateY(calc(0.5em * var(--dir, 1))) scale(0.72);
+    opacity: 0;
+    filter: blur(var(--s-blur));
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+```
+
+#### JS Controller
+```js
+else if (id === "drum-counter") {
+      container.innerHTML = `
+        <div class="st-counter-readout" data-target aria-live="polite">1,248</div>
+        <div class="st-inline-controls">
+          <button type="button" class="st-chip-btn" data-delta="-24">-24</button>
+          <button type="button" class="st-chip-btn" data-delta="12">+12</button>
+          <button type="button" class="st-chip-btn" data-delta="135">+135</button>
+        </div>
+      `;
+      const readout = container.querySelector("[data-target]");
+      rootTarget = readout;
+      let value = 1248;
+
+      function update(delta) {
+        const nextValue = Math.max(0, value + delta);
+        if (nextValue === value) {
+          emit("drum-counter → already at floor (0)");
+          return;
+        }
+        const prev = value.toLocaleString("en-US");
+        value = nextValue;
+        const next = value.toLocaleString("en-US");
+        const dir = delta >= 0 ? 1 : -1;
+        readout.style.setProperty("--dir", String(dir));
+        const sameLen = prev.length === next.length;
+        readout.innerHTML = "";
+        let staggerIdx = 0;
+        for (let i = 0; i < next.length; i++) {
+          const ch = next[i];
+          if (sameLen && prev[i] === ch) {
+            readout.append(document.createTextNode(ch));
+          } else {
+            const slot = document.createElement("span");
+            slot.className = "st-digit-slot";
+            if (sameLen) {
+              const oldEl = document.createElement("span");
+              oldEl.className = "st-digit-old";
+              oldEl.setAttribute("aria-hidden", "true");
+              oldEl.textContent = prev[i];
+              slot.appendChild(oldEl);
+            }
+            const newEl = document.createElement("span");
+            newEl.className = "st-digit-new";
+            newEl.style.setProperty("--stagger-d", `calc(var(--s-stagger) * ${staggerIdx})`);
+            newEl.textContent = ch;
+            slot.appendChild(newEl);
+            readout.appendChild(slot);
+            staggerIdx++;
+          }
+        }
+        emit(`drum-counter → ${prev} → ${next} (${staggerIdx} digits animated)`);
+      }
+
+      container.querySelectorAll("[data-delta]").forEach((b) => {
+        b.addEventListener("click", () => update(Number(b.dataset.delta)));
+      });
+      triggerPrimary = () => update(135);
+    }
+```
+
+### Magnetic Avatar Wave & 3D Tilt (`hover-cluster`)
+- **Category**: Micro-Motion | **Spec**: 320ms wave · 3D glare | **Triggers**: Hover / Tap / Pointermove / Leave
+- **Default Easing**: `cubic-bezier(0.34, 3.85, 0.64, 1)`
+- **Workbench**: https://17860288878k-debug.github.io/motion-lab/study.html?id=hover-cluster
+- **Rationale**: Neighbor displacement decays exponentially (0.45^distance) on hover-in and snaps back with a lively spring curve on mouse leave.
+
+#### CSS
+```css
+/* 12. Magnetic Avatar Wave & 3D Tilt */
+.st-cluster-wrap {
+  --s-dur: 320ms;
+  --s-lift: -6px;
+  --s-ease-in: var(--ease-smooth-out);
+  --s-ease-out: var(--ease-bounce-strong);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.st-avatar-row {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px;
+}
+
+.st-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 2.5px solid var(--ml-surface);
+  margin-left: -10px;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #ffffff;
+  box-shadow: var(--ml-shadow-sm);
+  transform: translateY(var(--shift, 0px)) scale(var(--scale, 1));
+  transition: transform calc(var(--s-dur) * var(--ml-speed)) var(--avatar-ease, var(--s-ease-in));
+}
+
+.st-avatar:first-child {
+  margin-left: 0;
+}
+
+.st-tilt-card {
+  --rx: 0deg;
+  --ry: 0deg;
+  --gx: 50%;
+  --gy: 50%;
+  --go: 0;
+  --s-return: 850ms;
+  position: relative;
+  width: 214px;
+  height: 102px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #161b26 0%, #24345c 100%);
+  color: #ffffff;
+  box-shadow: var(--ml-shadow-md);
+  transform: perspective(900px) rotateX(var(--rx)) rotateY(var(--ry));
+  transition: transform calc(var(--s-return) * var(--ml-speed)) var(--ease-smooth-out);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.st-tilt-card.is-tilting {
+  transition: transform 90ms linear;
+}
+
+.st-tilt-glare {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at var(--gx) var(--gy), rgba(255, 255, 255, 0.34), transparent 58%);
+  opacity: var(--go);
+  transition: opacity 260ms var(--ease-smooth-out);
+}
+```
+
+#### JS Controller
+```js
+else if (id === "hover-cluster") {
+      const colors = ["#2257F2", "#0D9468", "#D97706", "#E11D48", "#7C3AED"];
+      const initials = ["KL", "MR", "AN", "JT", "SY"];
+      container.innerHTML = `
+        <div class="st-cluster-wrap" data-target>
+          <div class="st-avatar-row" data-avatars>
+            ${initials.map((t, i) => `<div class="st-avatar" tabindex="0" role="button" aria-label="Avatar ${t}" style="background:${colors[i]}" data-av="${i}">${t}</div>`).join("")}
+          </div>
+          <div class="st-tilt-card" data-tilt>
+            <div class="st-tilt-glare"></div>
+            <div style="display:flex;justify-content:space-between;font-size:11px;opacity:.75;font-family:var(--ml-font-mono);">
+              <span>STUDIO PASS</span><span>3D TILT</span>
+            </div>
+            <div style="font-size:15px;font-weight:700;letter-spacing:-0.01em;">Move pointer to tilt</div>
+          </div>
+        </div>
+      `;
+      const wrap = container.querySelector("[data-target]");
+      const row = wrap.querySelector("[data-avatars]");
+      const avs = Array.from(row.querySelectorAll("[data-av]"));
+      const tilt = wrap.querySelector("[data-tilt]");
+      rootTarget = wrap;
+      let waveTimer = null;
+
+      function resetRest() {
+        avs.forEach((el) => {
+          el.style.setProperty("--shift", "0px");
+          el.style.setProperty("--scale", "1");
+        });
+        tilt.classList.remove("is-tilting");
+        tilt.style.setProperty("--rx", "0deg");
+        tilt.style.setProperty("--ry", "0deg");
+        tilt.style.setProperty("--go", "0");
+      }
+
+      function setWave(activeIdx, isLeave) {
+        if (isReducedMotion(container)) {
+          resetRest();
+          return;
+        }
+        const liftVal = parseFloat(getComputedStyle(wrap).getPropertyValue("--s-lift")) || -6;
+        const ease = isLeave ? "var(--s-ease-out)" : "var(--s-ease-in)";
+        avs.forEach((el, i) => {
+          el.style.setProperty("--avatar-ease", ease);
+          if (activeIdx === null) {
+            el.style.setProperty("--shift", "0px");
+            el.style.setProperty("--scale", "1");
+            return;
+          }
+          const d = Math.abs(i - activeIdx);
+          const shift = (liftVal * Math.pow(0.45, d)).toFixed(2) + "px";
+          el.style.setProperty("--shift", shift);
+          el.style.setProperty("--scale", i === activeIdx ? "1.08" : "1");
+        });
+      }
+
+      avs.forEach((el, i) => {
+        el.addEventListener("mouseenter", () => {
+          setWave(i, false);
+          emit(`avatar-wave → hover index ${i} (${initials[i]})`);
+        });
+        el.addEventListener("focus", () => setWave(i, false));
+        el.addEventListener("blur", () => setWave(null, true));
+        el.addEventListener("click", () => {
+          clearTimeout(waveTimer);
+          setWave(i, false);
+          waveTimer = setTimeout(() => setWave(null, true), 450);
+          emit(`avatar-wave → tap index ${i} (${initials[i]})`);
+        });
+      });
+      row.addEventListener("mouseleave", () => {
+        setWave(null, true);
+        emit("avatar-wave → bouncy spring return");
+      });
+
+      tilt.addEventListener("pointermove", (e) => {
+        if (isReducedMotion(container)) {
+          resetRest();
+          return;
+        }
+        const r = tilt.getBoundingClientRect();
+        const px = (e.clientX - r.left) / r.width;
+        const py = (e.clientY - r.top) / r.height;
+        const ry = ((px - 0.5) * 24).toFixed(2) + "deg";
+        const rx = ((0.5 - py) * 18).toFixed(2) + "deg";
+        tilt.classList.add("is-tilting");
+        tilt.style.setProperty("--rx", rx);
+        tilt.style.setProperty("--ry", ry);
+        tilt.style.setProperty("--gx", (px * 100).toFixed(1) + "%");
+        tilt.style.setProperty("--gy", (py * 100).toFixed(1) + "%");
+        tilt.style.setProperty("--go", "1");
+      });
+      tilt.addEventListener("pointerleave", () => {
+        tilt.classList.remove("is-tilting");
+        tilt.style.setProperty("--rx", "0deg");
+        tilt.style.setProperty("--ry", "0deg");
+        tilt.style.setProperty("--go", "0");
+        emit("3d-tilt → smooth return to rest");
+      });
+
+      cleanups.push(() => clearTimeout(waveTimer));
+      triggerPrimary = () => {
+        clearTimeout(waveTimer);
+        if (isReducedMotion(container)) {
+          resetRest();
+          emit("hover-cluster → suppressed under Reduced Motion");
+          return;
+        }
+        setWave(2, false);
+        waveTimer = setTimeout(() => setWave(null, true), 450);
+      };
+    }
+```
+
+---
+
+## 8 Interactive UI Components
+
+### Shared Widget Shell CSS
+```css
+/* Shared Interactive Widget Card Shell */
+.uiw {
+  position: relative;
+  width: 100%;
+  max-width: 392px;
+  border-radius: 26px;
+  overflow: hidden;
+  background: #ffffff;
+  color: #111114;
+  border: 1px solid rgba(15, 23, 42, 0.085);
+  box-shadow: 0 18px 44px -14px rgba(15, 23, 42, 0.14), 0 3px 10px -2px rgba(15, 23, 42, 0.06);
+  font-family: var(--ml-font-sans);
+}
+
+.uiw.is-dark {
+  background: #131317;
+  color: #f4f4f6;
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 22px 50px -12px rgba(0, 0, 0, 0.45);
+}
+
+.uiw.is-cobalt {
+  background: linear-gradient(155deg, #1347e6 0%, #16379c 55%, #0c1f5e 100%);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow: 0 22px 50px -12px rgba(18, 56, 176, 0.42);
+}
+
+.uiw.is-warm {
+  background: #faf7f2;
+  color: #1c1917;
+  border-color: rgba(120, 90, 60, 0.14);
+}
+
+.uiw-mono {
+  font-family: var(--ml-font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.uiw-tnum {
+  font-variant-numeric: tabular-nums;
+}
+```
+
+### Pulse Climate Dial (`pulse-climate`)
+- **Category**: Controls | **Triggers**: Click − / + · Switch Eco / Comfort / Warm Glow
+- **Tokens**: `--ease-bounce: cubic-bezier(0.34, 1.36, 0.64, 1); --dur-dial: 280ms;`
+- **Preview**: https://17860288878k-debug.github.io/motion-lab/components.html#pulse-climate
+- **Summary**: Circular architectural thermostat with 36 precision ticks, glowing conic arc, stepper controls, and ambient mood switcher.
+
+#### CSS
+```css
+/* 1. PULSE CLIMATE DIAL */
+.uiw-pulse {
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.uiw-pulse-glow {
+  position: absolute;
+  inset: auto -30px -50px -30px;
+  height: 160px;
+  border-radius: 50%;
+  filter: blur(36px);
+  opacity: 0.34;
+  pointer-events: none;
+  transition: background 420ms var(--ease-smooth-out), opacity 420ms ease;
+}
+
+.uiw-head {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.uiw-h-title {
+  font-size: 16.5px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.uiw-h-sub {
+  font-size: 12px;
+  color: #71717a;
+  margin-top: 2px;
+}
+
+.uiw.is-dark .uiw-h-sub { color: #9696a2; }
+.uiw.is-cobalt .uiw-h-sub { color: rgba(255, 255, 255, 0.72); }
+
+.uiw-stat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: #f4f4f6;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #3f3f46;
+  white-space: nowrap;
+}
+
+.uiw-dial-wrap {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 214px;
+}
+
+.uiw-dial-center {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.uiw-temp-val {
+  font-size: 38px;
+  font-weight: 700;
+  letter-spacing: -0.045em;
+  line-height: 1;
+}
+
+.uiw-dial-lbl {
+  font-size: 11px;
+  font-weight: 600;
+  color: #8b8b96;
+  margin-top: 4px;
+}
+
+.uiw-steppers {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.uiw-circle-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  background: #ffffff;
+  color: #111114;
+  font-size: 16px;
+  font-weight: 600;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.07);
+  transition: transform 140ms var(--ease-bounce), background-color 140ms ease;
+}
+
+.uiw-circle-btn:hover { background: #f4f4f6; }
+.uiw-circle-btn:active { transform: scale(0.9); }
+
+.uiw-seg {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  padding: 4px;
+  border-radius: 13px;
+  background: #f1f1f4;
+}
+
+.uiw-seg-thumb {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: calc((100% - 8px) / 3);
+  height: calc(100% - 8px);
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.09);
+  transition: transform 300ms var(--ease-bounce);
+}
+
+.uiw-seg-btn {
+  position: relative;
+  z-index: 1;
+  height: 32px;
+  border: 0;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 600;
+  color: #71717a;
+  transition: color 200ms ease;
+}
+
+.uiw-seg-btn[aria-selected="true"] {
+  color: #111114;
+}
+```
+
+#### JS Controller & Markup
+```js
+if (id === "pulse-climate") {
+      const gradId = `mlPulseGrad_${uid}`;
+      const ticks = Array.from({ length: 36 }, (_, i) => {
+        const deg = -135 + (i / 35) * 270;
+        return `<line x1="110" y1="12" x2="110" y2="${i % 5 === 0 ? 21 : 17}" stroke="rgba(17,17,20,0.16)" stroke-width="${i % 5 === 0 ? 1.8 : 1.1}" stroke-linecap="round" transform="rotate(${deg} 110 110)"/>`;
+      }).join("");
+
+      container.innerHTML = `
+        <div class="uiw uiw-pulse">
+          <div class="uiw-pulse-glow" data-glow></div>
+          <div class="uiw-head">
+            <div>
+              <div class="uiw-h-title">Living Studio</div>
+              <div class="uiw-h-sub">Radiant climate · Auto fan</div>
+            </div>
+            <div class="uiw-stat-pill"><span style="width:7px;height:7px;border-radius:50%;background:#10b981"></span><span class="uiw-tnum">42% RH</span></div>
+          </div>
+          <div class="uiw-dial-wrap">
+            <svg viewBox="0 0 220 220" width="212" height="212" aria-hidden="true">
+              <defs>
+                <linearGradient id="${gradId}" x1="0%" y1="100%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#38bdf8"/>
+                  <stop offset="50%" stop-color="#f59e0b"/>
+                  <stop offset="100%" stop-color="#ef4444"/>
+                </linearGradient>
+              </defs>
+              ${ticks}
+              <circle cx="110" cy="110" r="80" fill="none" stroke="#eeeef2" stroke-width="11" stroke-dasharray="377 503" stroke-linecap="round" transform="rotate(135 110 110)"/>
+              <circle data-arc cx="110" cy="110" r="80" fill="none" stroke="url(#${gradId})" stroke-width="11" stroke-dasharray="190 503" stroke-linecap="round" transform="rotate(135 110 110)" style="transition:stroke-dasharray 280ms var(--ease-smooth-out)"/>
+              <g data-knob style="transition:transform 280ms var(--ease-bounce);transform-origin:110px 110px">
+                <circle cx="110" cy="30" r="8.5" fill="#ffffff" stroke="#111114" stroke-width="2.5"/>
+              </g>
+            </svg>
+            <div class="uiw-dial-center">
+              <div class="uiw-temp-val uiw-tnum" data-temp>22.0°</div>
+              <div class="uiw-dial-lbl" data-lbl>Balanced comfort</div>
+              <div class="uiw-steppers">
+                <button type="button" class="uiw-circle-btn" data-minus aria-label="Decrease temperature">−</button>
+                <button type="button" class="uiw-circle-btn" data-plus aria-label="Increase temperature">+</button>
+              </div>
+            </div>
+          </div>
+          <div class="uiw-seg" role="tablist" aria-label="Climate mood">
+            <div class="uiw-seg-thumb" data-thumb></div>
+            <button type="button" class="uiw-seg-btn" role="tab" aria-selected="false" data-m="0">Eco</button>
+            <button type="button" class="uiw-seg-btn" role="tab" aria-selected="true" data-m="1">Comfort</button>
+            <button type="button" class="uiw-seg-btn" role="tab" aria-selected="false" data-m="2">Warm Glow</button>
+          </div>
+        </div>
+      `;
+
+      let temp = 22.0;
+      let mood = 1;
+      const arc = container.querySelector("[data-arc]");
+      const knob = container.querySelector("[data-knob]");
+      const tempEl = container.querySelector("[data-temp]");
+      const lbl = container.querySelector("[data-lbl]");
+      const glow = container.querySelector("[data-glow]");
+      const thumb = container.querySelector("[data-thumb]");
+      const moodBtns = Array.from(container.querySelectorAll("[data-m]"));
+
+      function sync() {
+        const frac = Math.max(0, Math.min(1, (temp - 16) / 12));
+        tempEl.textContent = `${temp.toFixed(1)}°`;
+        arc.setAttribute("stroke-dasharray", `${(frac * 377).toFixed(1)} 503`);
+        knob.style.transform = `rotate(${(-135 + frac * 270).toFixed(1)}deg)`;
+        thumb.style.transform = `translateX(${mood * 100}%)`;
+        moodBtns.forEach((b, i) => b.setAttribute("aria-selected", String(i === mood)));
+        if (mood === 2) {
+          glow.style.background = "radial-gradient(circle, #f97316, #fbbf24 55%, transparent 75%)";
+          lbl.textContent = "Warm Glow active";
+        } else if (mood === 0) {
+          glow.style.background = "radial-gradient(circle, #34d399, #38bdf8 55%, transparent 75%)";
+          lbl.textContent = "Eco saver mode";
+        } else {
+          glow.style.background = "radial-gradient(circle, #38bdf8, #818cf8 55%, transparent 75%)";
+          lbl.textContent = temp >= 23 ? "Warming studio…" : "Balanced comfort";
+        }
+      }
+
+      container.querySelector("[data-minus]").addEventListener("click", () => {
+        temp = Math.max(16, Math.round((temp - 0.5) * 10) / 10);
+        sync();
+      });
+      container.querySelector("[data-plus]").addEventListener("click", () => {
+        temp = Math.min(28, Math.round((temp + 0.5) * 10) / 10);
+        sync();
+      });
+      moodBtns.forEach((b) => {
+        b.addEventListener("click", () => {
+          mood = Number(b.dataset.m);
+          if (mood === 0) temp = 19.5;
+          if (mood === 1) temp = 22.0;
+          if (mood === 2) temp = 24.5;
+          sync();
+        });
+      });
+      sync();
+    }
+```
+
+### Orbit Live Flight Pass (`orbit-flight`)
+- **Category**: Cards | **Triggers**: Switch Live Route / Gate B14 / Boarding
+- **Tokens**: `--ease-smooth-out: cubic-bezier(0.22, 1, 0.36, 1); --dur-tab: 300ms;`
+- **Preview**: https://17860288878k-debug.github.io/motion-lab/components.html#orbit-flight
+- **Summary**: Cobalt aviation tracker with SVG great-circle flight path, pulsing radar plane indicator, and live boarding tab transition.
+
+#### CSS
+```css
+/* 2. ORBIT FLIGHT PASS */
+.uiw-orbit {
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.uiw-orbit-badge {
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+  transition: background-color 240ms ease, color 240ms ease;
+}
+
+.uiw-orbit-badge.is-boarding {
+  background: rgba(52, 211, 153, 0.28);
+  color: #a7f3d0;
+}
+
+.uiw-iata-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.uiw-iata {
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.uiw-orbit-meta {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.uiw-orbit-k {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.uiw-orbit-v {
+  font-size: 13.5px;
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+.uiw.is-cobalt .uiw-seg {
+  background: rgba(7, 16, 48, 0.36);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.uiw.is-cobalt .uiw-seg-thumb {
+  background: rgba(255, 255, 255, 0.22);
+  box-shadow: none;
+}
+
+.uiw.is-cobalt .uiw-seg-btn { color: rgba(255, 255, 255, 0.72); }
+.uiw.is-cobalt .uiw-seg-btn[aria-selected="true"] { color: #ffffff; }
+```
+
+#### JS Controller & Markup
+```js
+else if (id === "orbit-flight") {
+      container.innerHTML = `
+        <div class="uiw is-cobalt uiw-orbit">
+          <div class="uiw-head">
+            <div class="uiw-mono" style="font-size:11.5px;opacity:.78;font-weight:600">JL 002 · BOEING 787-9</div>
+            <div class="uiw-orbit-badge" data-badge>On Time · 38,000 ft</div>
+          </div>
+          <div class="uiw-iata-row">
+            <div><div class="uiw-iata">HND</div><div class="uiw-h-sub">Tokyo Haneda</div></div>
+            <div style="text-align:right"><div class="uiw-iata">SFO</div><div class="uiw-h-sub">San Francisco</div></div>
+          </div>
+          <svg viewBox="0 0 360 88" width="100%" height="88" aria-hidden="true">
+            <path d="M 14 70 Q 180 -6 346 70" fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="2" stroke-dasharray="5 5"/>
+            <path data-path d="M 14 70 Q 180 -6 346 70" fill="none" stroke="#93c5fd" stroke-width="2.8" stroke-linecap="round" stroke-dasharray="210 380" style="transition:stroke-dasharray 380ms var(--ease-smooth-out)"/>
+            <circle cx="14" cy="70" r="4" fill="#ffffff"/>
+            <circle cx="346" cy="70" r="4" fill="rgba(255,255,255,0.45)"/>
+            <g data-plane style="transition:transform 380ms var(--ease-smooth-out)">
+              <circle cx="0" cy="0" r="11" fill="rgba(147,197,253,0.28)"/>
+              <circle cx="0" cy="0" r="4.5" fill="#ffffff"/>
+            </g>
+          </svg>
+          <div class="uiw-orbit-meta">
+            <div><div class="uiw-orbit-k">Progress</div><div class="uiw-orbit-v uiw-tnum" data-v1>58%</div></div>
+            <div><div class="uiw-orbit-k">Gate</div><div class="uiw-orbit-v uiw-mono" data-v2>B14</div></div>
+            <div><div class="uiw-orbit-k">Seat</div><div class="uiw-orbit-v uiw-mono" data-v3>14A</div></div>
+          </div>
+          <div class="uiw-seg" role="tablist" aria-label="Flight view">
+            <div class="uiw-seg-thumb" data-thumb></div>
+            <button type="button" class="uiw-seg-btn" role="tab" aria-selected="true" data-t="0">Live Route</button>
+            <button type="button" class="uiw-seg-btn" role="tab" aria-selected="false" data-t="1">Gate B14</button>
+            <button type="button" class="uiw-seg-btn" role="tab" aria-selected="false" data-t="2">Boarding</button>
+          </div>
+        </div>
+      `;
+
+      const states = [
+        { pt: 0.58, badge: "On Time · 38,000 ft", boarding: false, v1: "58%", v2: "B14", v3: "14A" },
+        { pt: 0.72, badge: "Terminal 3 · 4m walk", boarding: false, v1: "72%", v2: "B14 · T3", v3: "14A" },
+        { pt: 0.84, badge: "● Boarding · Group 1", boarding: true, v1: "84%", v2: "B14 · T3", v3: "14A · G1" }
+      ];
+      const badge = container.querySelector("[data-badge]");
+      const pathEl = container.querySelector("[data-path]");
+      const planeEl = container.querySelector("[data-plane]");
+      const thumb = container.querySelector("[data-thumb]");
+      const tabs = Array.from(container.querySelectorAll("[data-t]"));
+
+      function setTab(i) {
+        const s = states[i];
+        tabs.forEach((b, idx) => b.setAttribute("aria-selected", String(idx === i)));
+        thumb.style.transform = `translateX(${i * 100}%)`;
+        badge.textContent = s.badge;
+        badge.classList.toggle("is-boarding", s.boarding);
+        container.querySelector("[data-v1]").textContent = s.v1;
+        container.querySelector("[data-v2]").textContent = s.v2;
+        container.querySelector("[data-v3]").textContent = s.v3;
+
+        const pt = s.pt;
+        const bx = (1 - pt) * (1 - pt) * 14 + 2 * (1 - pt) * pt * 180 + pt * pt * 346;
+        const by = (1 - pt) * (1 - pt) * 70 + 2 * (1 - pt) * pt * (-6) + pt * pt * 70;
+        planeEl.style.transform = `translate(${bx.toFixed(1)}px, ${by.toFixed(1)}px)`;
+        pathEl.setAttribute("stroke-dasharray", `${(pt * 356).toFixed(1)} 380`);
+      }
+
+      tabs.forEach((b) => b.addEventListener("click", () => setTab(Number(b.dataset.t))));
+      setTab(0);
+    }
+```
+
+### Tempo Spatial Audio Deck (`tempo-audio`)
+- **Category**: Media | **Triggers**: Play / Pause · Switch Studio / Warm / Spatial
+- **Tokens**: `--dur-eq: 140ms; --ease-bounce: cubic-bezier(0.34, 1.36, 0.64, 1);`
+- **Preview**: https://17860288878k-debug.github.io/motion-lab/components.html#tempo-audio
+- **Summary**: Obsidian hi-fi vinyl player with 18-bar animated harmonic equalizer and color-shifting Studio / Warm / Spatial sound presets.
+
+#### CSS
+```css
+/* 3. TEMPO SPATIAL AUDIO DECK */
+.uiw-tempo {
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.uiw-tempo-glow {
+  position: absolute;
+  top: -50px;
+  left: 50%;
+  width: 280px;
+  height: 150px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  filter: blur(42px);
+  opacity: 0.35;
+  pointer-events: none;
+  transition: background 380ms ease;
+}
+
+.uiw-vinyl {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: radial-gradient(circle at 50% 50%, #f4f4f6 0 11%, #18181b 11.5% 15%, #27272e 15.5% 32%, #18181d 32.5% 48%, #24242b 48.5% 100%);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+}
+
+.uiw-play-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 0;
+  background: #f4f4f6;
+  color: #111114;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  transition: transform 140ms var(--ease-bounce);
+}
+
+.uiw-play-btn:active { transform: scale(0.9); }
+
+.uiw-eq-stage {
+  position: relative;
+  z-index: 2;
+  height: 126px;
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: flex-end;
+  gap: 5px;
+}
+
+.uiw-eq-bar {
+  flex: 1;
+  border-radius: 99px;
+  min-height: 8px;
+  transition: height 140ms linear, background 260ms ease;
+}
+
+.uiw.is-dark .uiw-seg {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.uiw.is-dark .uiw-seg-thumb {
+  background: #262630;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+}
+
+.uiw.is-dark .uiw-seg-btn { color: #8b8b96; }
+.uiw.is-dark .uiw-seg-btn[aria-selected="true"] { color: #ffffff; }
+```
+
+#### JS Controller & Markup
+```js
+else if (id === "tempo-audio") {
+      container.innerHTML = `
+        <div class="uiw is-dark uiw-tempo">
+          <div class="uiw-tempo-glow" data-glow></div>
+          <div class="uiw-head">
+            <div style="display:flex;align-items:center;gap:12px">
+              <div class="uiw-vinyl" data-vinyl></div>
+              <div>
+                <div class="uiw-h-title">Midnight Tape</div>
+                <div class="uiw-h-sub" data-sub>Analog Sessions · 96kHz FLAC</div>
+              </div>
+            </div>
+            <button type="button" class="uiw-play-btn" data-play aria-label="Play or pause track">
+              <span data-play-ico>▶</span>
+            </button>
+          </div>
+          <div class="uiw-eq-stage">
+            ${Array.from({ length: 18 }, (_, i) => `<div class="uiw-eq-bar" data-bar="${i}" style="height:22%"></div>`).join("")}
+          </div>
+          <div class="uiw-seg" role="tablist" aria-label="Sound preset">
+            <div class="uiw-seg-thumb" data-thumb></div>
+            <button type="button" class="uiw-seg-btn" role="tab" aria-selected="true" data-p="0">Studio</button>
+            <button type="button" class="uiw-seg-btn" role="tab" aria-selected="false" data-p="1">Warm</button>
+            <button type="button" class="uiw-seg-btn" role="tab" aria-selected="false" data-p="2">Spatial</button>
+          </div>
+        </div>
+      `;
+
+      let playing = true;
+      let preset = 0;
+      let phase = 0;
+      const bars = Array.from(container.querySelectorAll("[data-bar]"));
+      const glow = container.querySelector("[data-glow]");
+      const sub = container.querySelector("[data-sub]");
+      const thumb = container.querySelector("[data-thumb]");
+      const playIco = container.querySelector("[data-play-ico]");
+      const vinyl = container.querySelector("[data-vinyl]");
+      const presetBtns = Array.from(container.querySelectorAll("[data-p]"));
+      const presets = [
+        { sub: "Analog Sessions · 96kHz FLAC", glow: "radial-gradient(circle,#a78bfa,#6366f1 60%,transparent)", grad: "linear-gradient(180deg,#c4b5fd,#818cf8 65%,rgba(129,140,248,0.22))" },
+        { sub: "Warm Tube EQ · +4dB Low", glow: "radial-gradient(circle,#f59e0b,#ec4899 60%,transparent)", grad: "linear-gradient(180deg,#fcd34d,#f97316 65%,rgba(249,115,22,0.22))" },
+        { sub: "Spatial Atmos · 360° Stage", glow: "radial-gradient(circle,#38bdf8,#a78bfa 60%,transparent)", grad: "linear-gradient(180deg,#67e8f9,#818cf8 65%,rgba(129,140,248,0.22))" }
+      ];
+
+      function renderEq() {
+        const cfg = presets[preset];
+        glow.style.background = cfg.glow;
+        sub.textContent = cfg.sub;
+        thumb.style.transform = `translateX(${preset * 100}%)`;
+        playIco.textContent = playing ? "❚❚" : "▶";
+        presetBtns.forEach((b, i) => b.setAttribute("aria-selected", String(i === preset)));
+        bars.forEach((bar, i) => {
+          const norm = i / (bars.length - 1);
+          const bias = 1 - Math.abs(norm - 0.5) * (preset === 2 ? 0.5 : 1.1);
+          const warm = preset === 1 ? (1 - norm) * 0.34 : 0;
+          const wave = 0.5 + 0.34 * Math.sin(phase + i * 0.6) + 0.16 * Math.cos(phase * 0.7 - i);
+          const h = playing ? 16 + Math.min(1, Math.max(0.12, wave * bias + warm)) * 78 : 14 + (i % 3) * 5;
+          bar.style.height = `${h.toFixed(1)}%`;
+          bar.style.background = cfg.grad;
+        });
+        vinyl.style.transform = `rotate(${(phase * 28).toFixed(1)}deg)`;
+      }
+
+      const timer = setInterval(() => {
+        if (playing && !(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches)) {
+          phase += 0.32;
+          renderEq();
+        }
+      }, 130);
+      cleanups.push(() => clearInterval(timer));
+
+      container.querySelector("[data-play]").addEventListener("click", () => {
+        playing = !playing;
+        renderEq();
+      });
+      presetBtns.forEach((b) => {
+        b.addEventListener("click", () => {
+          preset = Number(b.dataset.p);
+          renderEq();
+        });
+      });
+      renderEq();
+    }
+```
+
+### Chroma Palette Studio (`chroma-mesh`)
+- **Category**: Creative | **Triggers**: Pick Swatch · Click Copy CSS
+- **Tokens**: `--dur-mesh: 420ms; --ease-smooth-out: cubic-bezier(0.22, 1, 0.36, 1);`
+- **Preview**: https://17860288878k-debug.github.io/motion-lab/components.html#chroma-mesh
+- **Summary**: Multi-layer radial mesh gradient studio with crossfading Solstice / Cobalt / Matcha themes, live OKLCH readout, and one-click CSS copy.
+
+#### CSS
+```css
+/* 4. CHROMA PALETTE STUDIO */
+.uiw-chroma {
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+
+.uiw-mesh-box {
+  position: relative;
+  height: 162px;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.08);
+}
+
+.uiw-mesh-layer {
+  position: absolute;
+  inset: -18px;
+  transition: opacity 420ms var(--ease-smooth-out), transform 500ms var(--ease-smooth-out);
+}
+
+.uiw-mesh-badge {
+  position: absolute;
+  left: 12px;
+  bottom: 10px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+  color: #111114;
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+.uiw-swatch-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.uiw-swatch-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 9px;
+  border-radius: 12px;
+  border: 1.5px solid transparent;
+  background: #f5f5f7;
+  color: #3f3f46;
+  font-size: 12px;
+  font-weight: 600;
+  transition: border-color 180ms ease, background-color 180ms ease, transform 120ms ease;
+}
+
+.uiw-swatch-btn[aria-pressed="true"] {
+  background: #ffffff;
+  border-color: #111114;
+  color: #111114;
+}
+
+.uiw-swatch-dot {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.uiw-token-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 12px;
+  border-radius: 11px;
+  background: #f8f8fa;
+  font-size: 11.5px;
+  color: #52525b;
+}
+```
+
+#### JS Controller & Markup
+```js
+else if (id === "chroma-mesh") {
+      const themes = [
+        { name: "Solstice Mesh", oklch: "oklch(0.71 0.19 352)", hex: "#FB7185", css: "background: radial-gradient(circle at 22% 30%, #fb7185 0%, transparent 56%), radial-gradient(circle at 78% 25%, #a78bfa 0%, transparent 58%), radial-gradient(circle at 60% 85%, #fbbf24 0%, transparent 62%), #4c1d95;" },
+        { name: "Cobalt Mesh", oklch: "oklch(0.66 0.20 256)", hex: "#38BDF8", css: "background: radial-gradient(circle at 25% 25%, #38bdf8 0%, transparent 56%), radial-gradient(circle at 80% 35%, #6366f1 0%, transparent 58%), radial-gradient(circle at 50% 85%, #2dd4bf 0%, transparent 62%), #0f172a;" },
+        { name: "Matcha Mesh", oklch: "oklch(0.79 0.17 154)", hex: "#34D399", css: "background: radial-gradient(circle at 22% 28%, #86efac 0%, transparent 58%), radial-gradient(circle at 78% 30%, #facc15 0%, transparent 56%), radial-gradient(circle at 52% 88%, #10b981 0%, transparent 62%), #064e3b;" }
+      ];
+
+      container.innerHTML = `
+        <div class="uiw uiw-chroma">
+          <div class="uiw-head">
+            <div class="uiw-h-title">Palette Studio</div>
+            <button type="button" class="ml-mini-btn" data-copy-css>Copy CSS</button>
+          </div>
+          <div class="uiw-mesh-box">
+            ${themes.map((t, i) => `<div class="uiw-mesh-layer" data-layer="${i}" style="${t.css};opacity:${i === 0 ? 1 : 0}"></div>`).join("")}
+            <div class="uiw-mesh-badge" data-name>Solstice Mesh</div>
+          </div>
+          <div class="uiw-swatch-row">
+            <button type="button" class="uiw-swatch-btn" aria-pressed="true" data-sw="0"><span class="uiw-swatch-dot" style="background:linear-gradient(135deg,#fb7185,#a78bfa)"></span>Solstice</button>
+            <button type="button" class="uiw-swatch-btn" aria-pressed="false" data-sw="1"><span class="uiw-swatch-dot" style="background:linear-gradient(135deg,#38bdf8,#6366f1)"></span>Cobalt</button>
+            <button type="button" class="uiw-swatch-btn" aria-pressed="false" data-sw="2"><span class="uiw-swatch-dot" style="background:linear-gradient(135deg,#34d399,#facc15)"></span>Matcha</button>
+          </div>
+          <div class="uiw-token-strip uiw-mono">
+            <span data-oklch>oklch(0.71 0.19 352)</span>
+            <span data-hex>#FB7185</span>
+          </div>
+        </div>
+      `;
+
+      let active = 0;
+      const layers = Array.from(container.querySelectorAll("[data-layer]"));
+      const swBtns = Array.from(container.querySelectorAll("[data-sw]"));
+      const copyBtn = container.querySelector("[data-copy-css]");
+
+      function pick(i) {
+        active = i;
+        layers.forEach((l, idx) => { l.style.opacity = idx === i ? "1" : "0"; });
+        swBtns.forEach((b, idx) => b.setAttribute("aria-pressed", String(idx === i)));
+        container.querySelector("[data-name]").textContent = themes[i].name;
+        container.querySelector("[data-oklch]").textContent = themes[i].oklch;
+        container.querySelector("[data-hex]").textContent = themes[i].hex;
+      }
+
+      swBtns.forEach((b) => b.addEventListener("click", () => pick(Number(b.dataset.sw))));
+      copyBtn.addEventListener("click", () => {
+        if (window.MotionLabApp) window.MotionLabApp.copyText(themes[active].css, `Copied ${themes[active].name} CSS`);
+        copyBtn.textContent = "✓ Copied";
+        setTimeout(() => { copyBtn.textContent = "Copy CSS"; }, 1400);
+      });
+    }
+```
+
+### Focus Deep Work Timer (`focus-timer`)
+- **Category**: Productivity | **Triggers**: Start / Pause Session · Toggle Ambient Sound Chips
+- **Tokens**: `--dur-ring: 320ms; --ease-smooth-out: cubic-bezier(0.22, 1, 0.36, 1);`
+- **Preview**: https://17860288878k-debug.github.io/motion-lab/components.html#focus-timer
+- **Summary**: Warm-paper Pomodoro timer with smooth SVG countdown ring, tabular digits, and Rain / Vinyl / Forest ambient chips.
+
+#### CSS
+```css
+/* 5. FOCUS DEEP WORK TIMER */
+.uiw-focus {
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.uiw-focus-ring {
+  position: relative;
+  height: 168px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.uiw-focus-center {
+  position: absolute;
+  text-align: center;
+}
+
+.uiw-focus-digits {
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.uiw-focus-btn {
+  align-self: center;
+  padding: 9px 22px;
+  border-radius: 999px;
+  border: 0;
+  background: #1c1917;
+  color: #faf7f2;
+  font-size: 13px;
+  font-weight: 600;
+  transition: background-color 200ms ease, transform 120ms ease;
+}
+
+.uiw-focus-btn.is-running { background: #dc5c3b; }
+.uiw-focus-btn:active { transform: scale(0.95); }
+
+.uiw-sound-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.uiw-sound-btn {
+  height: 34px;
+  border-radius: 11px;
+  border: 0;
+  background: #f1ebe1;
+  color: #57534e;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition: background-color 180ms ease, color 180ms ease;
+}
+
+.uiw-sound-btn[aria-pressed="true"] {
+  background: #dc5c3b;
+  color: #ffffff;
+}
+```
+
+#### JS Controller & Markup
+```js
+else if (id === "focus-timer") {
+      container.innerHTML = `
+        <div class="uiw is-warm uiw-focus">
+          <div class="uiw-head">
+            <div class="uiw-h-title">Deep Work</div>
+            <div class="uiw-stat-pill" data-st style="background:#efe9df;color:#78716c">● Ready · 25m</div>
+          </div>
+          <div class="uiw-focus-ring">
+            <svg viewBox="0 0 180 180" width="166" height="166" aria-hidden="true">
+              <circle cx="90" cy="90" r="74" fill="none" stroke="#e9e2d6" stroke-width="9"/>
+              <circle data-ring cx="90" cy="90" r="74" fill="none" stroke="#dc5c3b" stroke-width="9" stroke-linecap="round" stroke-dasharray="465" stroke-dashoffset="465" transform="rotate(-90 90 90)" style="transition:stroke-dashoffset 320ms var(--ease-smooth-out)"/>
+            </svg>
+            <div class="uiw-focus-center">
+              <div class="uiw-focus-digits uiw-mono" data-time>25:00</div>
+              <div class="uiw-h-sub" data-sub>Sprint block #2</div>
+            </div>
+          </div>
+          <button type="button" class="uiw-focus-btn" data-toggle>Start Focus</button>
+          <div class="uiw-sound-row">
+            <button type="button" class="uiw-sound-btn" aria-pressed="false" data-sound="Rain">Rain</button>
+            <button type="button" class="uiw-sound-btn" aria-pressed="false" data-sound="Vinyl">Vinyl</button>
+            <button type="button" class="uiw-sound-btn" aria-pressed="false" data-sound="Forest">Forest</button>
+          </div>
+        </div>
+      `;
+
+      let running = false;
+      let remaining = 1500;
+      let activeSound = "";
+      const ring = container.querySelector("[data-ring]");
+      const timeEl = container.querySelector("[data-time]");
+      const stEl = container.querySelector("[data-st]");
+      const subEl = container.querySelector("[data-sub]");
+      const toggleBtn = container.querySelector("[data-toggle]");
+      const soundBtns = Array.from(container.querySelectorAll("[data-sound]"));
+
+      function sync() {
+        const mm = String(Math.floor(remaining / 60)).padStart(2, "0");
+        const ss = String(remaining % 60).padStart(2, "0");
+        timeEl.textContent = `${mm}:${ss}`;
+        const pct = running ? Math.max(0.08, (1500 - remaining) / 60) : (1500 - remaining) / 60;
+        ring.setAttribute("stroke-dashoffset", String((465 * (1 - Math.min(1, pct))).toFixed(1)));
+        toggleBtn.textContent = running ? "Pause Session" : "Start Focus";
+        toggleBtn.classList.toggle("is-running", running);
+        stEl.textContent = running ? "● In Flow" : "● Ready · 25m";
+        stEl.style.background = running ? "#fdece7" : "#efe9df";
+        stEl.style.color = running ? "#c2410c" : "#78716c";
+        subEl.textContent = activeSound ? `${activeSound} ambience · active` : (running ? "Notifications muted" : "Sprint block #2");
+      }
+
+      const timer = setInterval(() => {
+        if (running && remaining > 0) {
+          remaining--;
+          sync();
+        }
+      }, 1000);
+      cleanups.push(() => clearInterval(timer));
+
+      toggleBtn.addEventListener("click", () => {
+        running = !running;
+        sync();
+      });
+      soundBtns.forEach((b) => {
+        b.addEventListener("click", () => {
+          const name = b.dataset.sound;
+          activeSound = activeSound === name ? "" : name;
+          soundBtns.forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.sound === activeSound)));
+          sync();
+        });
+      });
+      sync();
+    }
+```
+
+### Forge Edge Deploy Pipeline (`forge-deploy`)
+- **Category**: Developer | **Triggers**: Click Deploy Release / Redeploy
+- **Tokens**: `--dur-step: 240ms; --stagger: 520ms; --ease-bounce: cubic-bezier(0.34, 1.36, 0.64, 1);`
+- **Preview**: https://17860288878k-debug.github.io/motion-lab/components.html#forge-deploy
+- **Summary**: Interactive deployment card that cascades through 4 staggered build stages with spring checkmarks and live edge latency status.
+
+#### CSS
+```css
+/* 6. FORGE EDGE DEPLOY */
+.uiw-forge {
+  padding: 20px 22px;
+  background: #0e1117;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.uiw-forge-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.uiw-forge-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 12.5px;
+  transition: border-color 220ms ease, background-color 220ms ease;
+}
+
+.uiw-forge-row.is-active {
+  border-color: rgba(183, 164, 255, 0.42);
+  background: rgba(183, 164, 255, 0.09);
+}
+
+.uiw-forge-row.is-done {
+  border-color: rgba(52, 211, 153, 0.3);
+  background: rgba(52, 211, 153, 0.07);
+}
+
+.uiw-forge-ico {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: inline-grid;
+  place-items: center;
+  font-size: 11px;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.08);
+  color: #94a3b8;
+  transition: transform 240ms var(--ease-bounce), background-color 200ms ease, color 200ms ease;
+}
+
+.uiw-forge-row.is-done .uiw-forge-ico {
+  background: rgba(52, 211, 153, 0.24);
+  color: #34d399;
+}
+
+.uiw-forge-cta {
+  height: 40px;
+  border-radius: 12px;
+  border: 0;
+  background: #f8fafc;
+  color: #0f172a;
+  font-size: 13px;
+  font-weight: 700;
+  transition: background-color 220ms ease, color 220ms ease, transform 120ms ease;
+}
+
+.uiw-forge-cta.is-building { background: #1e293b; color: #e2e8f0; }
+.uiw-forge-cta.is-live { background: #10b981; color: #052e16; }
+.uiw-forge-cta:active { transform: scale(0.97); }
+```
+
+#### JS Controller & Markup
+```js
+else if (id === "forge-deploy") {
+      const steps = [
+        ["Typecheck & Lint", "0.4s"],
+        ["Bundle · 38.4 KB gzip", "1.1s"],
+        ["Edge CDN · 32 regions", "0.8s"],
+        ["Production Live", "14ms"]
+      ];
+      container.innerHTML = `
+        <div class="uiw is-dark uiw-forge">
+          <div class="uiw-head">
+            <div>
+              <div class="uiw-h-title">motion-lab</div>
+              <div class="uiw-h-sub uiw-mono">main · 4a9e2f · v2.0</div>
+            </div>
+            <div class="uiw-stat-pill uiw-mono" data-pill style="background:rgba(148,163,184,0.16);color:#cbd5e1">Ready</div>
+          </div>
+          <div class="uiw-forge-steps">
+            ${steps.map((s, i) => `
+              <div class="uiw-forge-row" data-row="${i}">
+                <span style="display:inline-flex;align-items:center;gap:9px"><span class="uiw-forge-ico" data-ico="${i}">○</span><span>${s[0]}</span></span>
+                <span class="uiw-mono" style="font-size:11px;color:#64748b" data-tm="${i}">${s[1]}</span>
+              </div>`).join("")}
+          </div>
+          <button type="button" class="uiw-forge-cta" data-deploy>Deploy Release</button>
+        </div>
+      `;
+
+      const rows = Array.from(container.querySelectorAll("[data-row]"));
+      const icos = Array.from(container.querySelectorAll("[data-ico]"));
+      const tms = Array.from(container.querySelectorAll("[data-tm]"));
+      const pill = container.querySelector("[data-pill]");
+      const btn = container.querySelector("[data-deploy]");
+      let timers = [];
+      let state = "idle"; // idle | building | live
+
+      function clearTimers() {
+        timers.forEach(clearTimeout);
+        timers = [];
+      }
+      cleanups.push(clearTimers);
+
+      function resetRows() {
+        rows.forEach((r, i) => {
+          r.className = "uiw-forge-row";
+          icos[i].textContent = "○";
+          tms[i].style.color = "#64748b";
+        });
+      }
+
+      btn.addEventListener("click", () => {
+        clearTimers();
+        resetRows();
+        state = "building";
+        btn.className = "uiw-forge-cta is-building";
+        btn.textContent = "Deploying release…";
+        pill.textContent = "● Building…";
+        pill.style.background = "rgba(183,164,255,0.2)";
+        pill.style.color = "#c4b5fd";
+
+        steps.forEach((_, idx) => {
+          timers.push(setTimeout(() => {
+            rows[idx].classList.add("is-active");
+            icos[idx].textContent = "◌";
+          }, idx * 420));
+          timers.push(setTimeout(() => {
+            rows[idx].classList.remove("is-active");
+            rows[idx].classList.add("is-done");
+            icos[idx].textContent = "✓";
+            tms[idx].style.color = "#34d399";
+            if (idx === steps.length - 1) {
+              state = "live";
+              btn.className = "uiw-forge-cta is-live";
+              btn.textContent = "✓ Deployed to Edge (Redeploy)";
+              pill.textContent = "● Live · 14ms";
+              pill.style.background = "rgba(52,211,153,0.18)";
+              pill.style.color = "#34d399";
+            }
+          }, idx * 420 + 360));
+        });
+      });
+    }
+```
+
+### Design Shelf 3D Deck (`shelf-books`)
+- **Category**: Media | **Triggers**: Click ‹ / › or Covers · Toggle Bookmark
+- **Tokens**: `--dur-deck: 360ms; --ease-bounce: cubic-bezier(0.34, 1.36, 0.64, 1);`
+- **Preview**: https://17860288878k-debug.github.io/motion-lab/components.html#shelf-books
+- **Summary**: Tactile Swiss graphic book cover-flow with perspective depth stacking, synced reading progress bar, and spring bookmark toggle.
+
+#### CSS
+```css
+/* 7. SHELF 3D BOOK DECK */
+.uiw-shelf {
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.uiw-shelf-deck {
+  position: relative;
+  height: 196px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.uiw-book {
+  position: absolute;
+  width: 132px;
+  height: 176px;
+  border-radius: 11px 15px 15px 11px;
+  padding: 15px 13px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 16px 32px -10px rgba(15, 23, 42, 0.26), inset 3px 0 0 rgba(255, 255, 255, 0.24);
+  transition: transform 360ms var(--ease-bounce), opacity 300ms ease;
+}
+
+.uiw-shelf-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  background: #ffffff;
+  color: #18181b;
+  font-size: 16px;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+  z-index: 15;
+}
+
+.uiw-shelf-arrow.is-left { left: 0; }
+.uiw-shelf-arrow.is-right { right: 0; }
+
+.uiw-shelf-bar {
+  padding: 10px 13px;
+  border-radius: 13px;
+  background: #f8f8fa;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.uiw-prog-track {
+  height: 6px;
+  border-radius: 99px;
+  background: #e5e7eb;
+  overflow: hidden;
+}
+
+.uiw-prog-fill {
+  height: 100%;
+  border-radius: 99px;
+  background: #111114;
+  transition: width 320ms var(--ease-smooth-out);
+}
+```
+
+#### JS Controller & Markup
+```js
+else if (id === "shelf-books") {
+      const books = [
+        { kicker: "EDITION 01", name: "Grid<br/>Systems", author: "Swiss Layout Archive", title: "Grid Systems", pct: 48, bg: "linear-gradient(155deg,#1d4ed8,#1e3a8a)", fg: "#eff6ff", bar: "#93c5fd" },
+        { kicker: "EDITION 02", name: "Kinetic<br/>Craft", author: "Interactive Motion", title: "Kinetic Craft", pct: 76, bg: "linear-gradient(155deg,#ea580c,#9a3412)", fg: "#fff7ed", bar: "#fed7aa" },
+        { kicker: "EDITION 03", name: "Spatial<br/>Type", author: "Variable Systems", title: "Spatial Type", pct: 90, bg: "linear-gradient(155deg,#0f172a,#1e293b)", fg: "#f8fafc", bar: "#34d399" }
+      ];
+      container.innerHTML = `
+        <div class="uiw uiw-shelf">
+          <div class="uiw-head">
+            <div><div class="uiw-h-title">Design Shelf</div><div class="uiw-h-sub">3 editions · Click arrows or covers</div></div>
+            <button type="button" class="ml-mini-btn" data-bm aria-pressed="false" aria-label="Bookmark edition">☆ Save</button>
+          </div>
+          <div class="uiw-shelf-deck">
+            <button type="button" class="uiw-shelf-arrow is-left" data-prev aria-label="Previous edition">‹</button>
+            ${books.map((b, i) => `
+              <div class="uiw-book" data-bk="${i}" style="background:${b.bg};color:${b.fg};cursor:pointer">
+                <div style="font-size:9px;font-weight:700;letter-spacing:.12em;opacity:.78">${b.kicker}</div>
+                <div>
+                  <div style="font-size:17px;font-weight:800;letter-spacing:-0.03em;line-height:1.08">${b.name}</div>
+                  <div style="width:30px;height:3px;border-radius:2px;background:${b.bar};margin-top:9px"></div>
+                </div>
+                <div style="font-size:10px;opacity:.82">${b.author}</div>
+              </div>`).join("")}
+            <button type="button" class="uiw-shelf-arrow is-right" data-next aria-label="Next edition">›</button>
+          </div>
+          <div class="uiw-shelf-bar">
+            <div style="display:flex;justify-content:space-between;font-size:12.5px;font-weight:600">
+              <span data-title>Kinetic Craft</span><span class="uiw-mono" data-pct>76%</span>
+            </div>
+            <div class="uiw-prog-track"><div class="uiw-prog-fill" data-fill style="width:76%"></div></div>
+          </div>
+        </div>
+      `;
+
+      let idx = 1;
+      let saved = false;
+      const bkEls = Array.from(container.querySelectorAll("[data-bk]"));
+      const bmBtn = container.querySelector("[data-bm]");
+
+      function sync() {
+        bkEls.forEach((el, i) => {
+          const rel = i - idx;
+          el.style.zIndex = String(10 - Math.abs(rel) * 3);
+          el.style.opacity = String(1 - Math.abs(rel) * 0.24);
+          el.style.transform = `translateX(${rel * 92}px) translateY(${Math.abs(rel) * 8}px) scale(${1 - Math.abs(rel) * 0.16}) rotate(${-rel * 8}deg)`;
+        });
+        container.querySelector("[data-title]").textContent = books[idx].title;
+        container.querySelector("[data-pct]").textContent = `${books[idx].pct}%`;
+        container.querySelector("[data-fill]").style.width = `${books[idx].pct}%`;
+      }
+
+      container.querySelector("[data-prev]").addEventListener("click", () => { idx = (idx + books.length - 1) % books.length; sync(); });
+      container.querySelector("[data-next]").addEventListener("click", () => { idx = (idx + 1) % books.length; sync(); });
+      bkEls.forEach((el) => el.addEventListener("click", () => { idx = Number(el.dataset.bk); sync(); }));
+      bmBtn.addEventListener("click", () => {
+        saved = !saved;
+        bmBtn.setAttribute("aria-pressed", String(saved));
+        bmBtn.textContent = saved ? "★ Saved" : "☆ Save";
+        bmBtn.style.color = saved ? "#e11d48" : "";
+      });
+      sync();
+    }
+```
+
+### Relay Issue Triage Card (`relay-triage`)
+- **Category**: Productivity | **Triggers**: Toggle Priority · Click Ship PR · Toggle Reactions
+- **Tokens**: `--dur-micro: 160ms; --ease-bounce: cubic-bezier(0.34, 1.36, 0.64, 1);`
+- **Preview**: https://17860288878k-debug.github.io/motion-lab/components.html#relay-triage
+- **Summary**: Linear-inspired engineering issue card with interactive priority escalation, Ship PR state morph, QA bar fill, and reaction toggles.
+
+#### CSS
+```css
+/* 8. RELAY ISSUE TRIAGE */
+.uiw-relay {
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.uiw-relay-props {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 15px;
+  background: #f8f8fa;
+  border: 1px solid rgba(15, 23, 42, 0.05);
+}
+
+.uiw-relay-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 9px;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  background: #ffffff;
+  font-size: 12px;
+  font-weight: 600;
+  color: #18181b;
+  transition: background-color 180ms ease, border-color 180ms ease, transform 140ms var(--ease-bounce);
+}
+
+.uiw-relay-pill.is-urgent {
+  background: #fff7ed;
+  border-color: rgba(234, 88, 12, 0.38);
+  color: #c2410c;
+}
+
+.uiw-react-chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: #f4f4f6;
+  color: #27272a;
+  font-size: 12px;
+  font-weight: 600;
+  transition: transform 160ms var(--ease-bounce), background-color 160ms ease;
+}
+
+.uiw-react-chip[aria-pressed="true"] {
+  background: #fff3eb;
+  border-color: rgba(234, 88, 12, 0.3);
+  color: #ea580c;
+}
+
+.uiw-ship-btn {
+  padding: 7px 14px;
+  border-radius: 10px;
+  border: 0;
+  background: #111114;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 600;
+  transition: background-color 200ms ease, transform 120ms ease;
+}
+
+.uiw-ship-btn.is-shipped { background: #059669; }
+```
+
+#### JS Controller & Markup
+```js
+else if (id === "relay-triage") {
+      container.innerHTML = `
+        <div class="uiw uiw-relay">
+          <div class="uiw-head">
+            <span class="uiw-stat-pill uiw-mono">ML-402</span>
+            <span class="uiw-stat-pill" data-st style="background:#eef2ff;color:#4338ca">● In Review</span>
+          </div>
+          <div>
+            <div style="font-size:19px;font-weight:700;letter-spacing:-0.025em">Spring Physics Engine</div>
+            <div class="uiw-h-sub" style="margin-top:4px">Interruptible gesture curves &amp; reduced-motion guard.</div>
+          </div>
+          <div class="uiw-relay-props">
+            <div>
+              <div style="font-size:11px;color:#8b8b96;margin-bottom:5px">Priority</div>
+              <button type="button" class="uiw-relay-pill" data-prio>● Medium</button>
+            </div>
+            <div>
+              <div style="font-size:11px;color:#8b8b96;margin-bottom:5px">QA Checks</div>
+              <div style="font-size:12px;font-weight:600" data-checks>11 / 12 passed</div>
+              <div class="uiw-prog-track" style="margin-top:5px"><div class="uiw-prog-fill" data-bar style="width:78%;background:#6366f1"></div></div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding-top:10px;border-top:1px solid rgba(15,23,42,0.08)">
+            <div style="display:flex;gap:6px">
+              <button type="button" class="uiw-react-chip" aria-pressed="false" data-react="fire">🔥 <span data-cnt>12</span></button>
+              <button type="button" class="uiw-react-chip" aria-pressed="false" data-react="zap">⚡ <span data-cnt>8</span></button>
+            </div>
+            <button type="button" class="uiw-ship-btn" data-ship>Ship PR</button>
+          </div>
+        </div>
+      `;
+
+      let urgent = false;
+      let shipped = false;
+      const prioBtn = container.querySelector("[data-prio]");
+      const stEl = container.querySelector("[data-st]");
+      const shipBtn = container.querySelector("[data-ship]");
+      const checksEl = container.querySelector("[data-checks]");
+      const barEl = container.querySelector("[data-bar]");
+
+      prioBtn.addEventListener("click", () => {
+        urgent = !urgent;
+        prioBtn.classList.toggle("is-urgent", urgent);
+        prioBtn.textContent = urgent ? "▲ Urgent" : "● Medium";
+      });
+
+      shipBtn.addEventListener("click", () => {
+        shipped = !shipped;
+        shipBtn.classList.toggle("is-shipped", shipped);
+        shipBtn.textContent = shipped ? "✓ Shipped" : "Ship PR";
+        stEl.textContent = shipped ? "● Shipped" : "● In Review";
+        stEl.style.background = shipped ? "#ecfdf5" : "#eef2ff";
+        stEl.style.color = shipped ? "#059669" : "#4338ca";
+        checksEl.textContent = shipped ? "12 / 12 passed" : "11 / 12 passed";
+        barEl.style.width = shipped ? "100%" : "78%";
+        barEl.style.background = shipped ? "#10b981" : "#6366f1";
+      });
+
+      container.querySelectorAll("[data-react]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const active = btn.getAttribute("aria-pressed") === "true";
+          const next = !active;
+          btn.setAttribute("aria-pressed", String(next));
+          const cnt = btn.querySelector("[data-cnt]");
+          cnt.textContent = String(Number(cnt.textContent) + (next ? 1 : -1));
+        });
+      });
+    }
+```

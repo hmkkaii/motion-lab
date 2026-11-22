@@ -6,9 +6,10 @@
   <title>Workbench — Motion Lab</title>
   <meta name="description" content="Interactive Motion Lab workbench for tuning live CSS transition duration, easing curves, slow-motion speed, and reduced-motion behavior." />
   <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg" />
-  <link rel="stylesheet" href="./assets/fonts/fonts.css" />
-  <link rel="stylesheet" href="./assets/css/design-system.css" />
-  <link rel="stylesheet" href="./assets/css/studies.css" />
+  <link rel="stylesheet" href="./assets/fonts/fonts.css?v=2.0.0" />
+  <link rel="stylesheet" href="./assets/css/design-system.css?v=2.0.0" />
+  <link rel="stylesheet" href="./assets/css/studies.css?v=2.0.0" />
+  <link rel="stylesheet" href="./assets/css/components.css?v=2.0.0" />
 </head>
 <body>
   <header class="ml-header">
@@ -22,14 +23,16 @@
           </svg>
         </span>
         <span>Motion Lab</span>
-        <span class="ml-brand-tag">v1.0</span>
+        <span class="ml-brand-tag">v2.0</span>
       </a>
 
       <nav class="ml-nav" aria-label="Primary navigation">
         <a class="ml-nav-link" href="./index.html">Studies</a>
+        <a class="ml-nav-link" href="./components.html">Components</a>
         <a class="ml-nav-link" href="./study.html?id=adaptive-card" aria-current="page">Workbench</a>
         <a class="ml-nav-link" href="./tokens.html">Curve Lab</a>
-        <a class="ml-nav-link" href="./about.html">About &amp; Licenses</a>
+        <a class="ml-nav-link" href="./ai.html">Skill &amp; MCP</a>
+        <a class="ml-nav-link" href="./about.html">About</a>
       </nav>
 
       <div class="ml-header-actions">
@@ -47,9 +50,11 @@
 
   <nav class="ml-mobile-nav" data-mobile-nav aria-label="Mobile navigation">
     <a class="ml-nav-link" href="./index.html">Studies</a>
+    <a class="ml-nav-link" href="./components.html">Components</a>
     <a class="ml-nav-link" href="./study.html?id=adaptive-card" aria-current="page">Workbench</a>
     <a class="ml-nav-link" href="./tokens.html">Curve Lab</a>
-    <a class="ml-nav-link" href="./about.html">About &amp; Licenses</a>
+    <a class="ml-nav-link" href="./ai.html">Skill &amp; MCP</a>
+    <a class="ml-nav-link" href="./about.html">About</a>
   </nav>
 
   <main class="ml-main">
@@ -110,7 +115,13 @@
           </div>
 
           <div>
-            <div style="font-size:12.5px;font-weight:600;margin-bottom:6px;">Active CSS Variables</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;flex-wrap:wrap;">
+              <span style="font-size:12.5px;font-weight:600;">Active CSS Variables</span>
+              <div class="ml-comp-btn-group">
+                <button type="button" class="ml-mini-btn" id="btn-copy-css">Copy CSS</button>
+                <button type="button" class="ml-mini-btn is-accent" id="btn-copy-ai">Copy for AI</button>
+              </div>
+            </div>
             <pre class="ml-code-block" id="study-tokens-code"></pre>
           </div>
 
@@ -130,14 +141,19 @@
 
   <footer class="ml-footer">
     <div class="ml-container ml-footer-inner">
-      <div><strong>Motion Lab</strong> — Interactive UI Motion Workbench.</div>
-      <div><a href="./about.html">Licenses &amp; Attribution</a></div>
+      <div><strong>Motion Lab v2.0</strong> — Interactive UI Motion Workbench.</div>
+      <div>
+        <a href="./llms.txt">llms.txt</a> ·
+        <a href="./registry.json">registry.json</a> ·
+        <a href="./ai.html">Skill &amp; MCP</a> ·
+        <a href="./about.html">Licenses</a>
+      </div>
     </div>
   </footer>
 
-  <script src="./assets/js/app.js"></script>
-  <script src="./assets/js/studies-data.js"></script>
-  <script src="./assets/js/studies-runtime.js"></script>
-  <script src="./assets/js/study-page.js"></script>
+  <script src="./assets/js/app.js?v=2.0.0"></script>
+  <script src="./assets/js/studies-data.js?v=2.0.0"></script>
+  <script src="./assets/js/studies-runtime.js?v=2.0.0"></script>
+  <script src="./assets/js/study-page.js?v=2.0.0"></script>
 </body>
 </html>

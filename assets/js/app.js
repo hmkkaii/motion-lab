@@ -1,8 +1,10 @@
-/* Motion Lab — Shared shell (theme persistence, mobile drawer, header chrome) */
+/* Motion Lab — Shared shell (theme persistence, mobile drawer, clipboard & toast helpers) */
 (function () {
   "use strict";
 
   const THEME_KEY = "motion-lab:theme";
+  let toastEl = null;
+  let toastTimer = null;
 
   function applyTheme(theme) {
     const resolved = theme === "dark" ? "dark" : "light";
@@ -32,6 +34,51 @@
     }
   }
 
+  function showToast(message) {
+    if (!toastEl) {
+      toastEl = document.createElement("div");
+      toastEl.className = "ml-toast-bar";
+      toastEl.setAttribute("role", "status");
+      toastEl.setAttribute("aria-live", "polite");
+      document.body.appendChild(toastEl);
+    }
+    toastEl.textContent = message;
+    toastEl.classList.add("is-visible");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+      toastEl.classList.remove("is-visible");
+    }, 2200);
+  }
+
+  async function copyText(text, successMsg) {
+    let ok = false;
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text);
+        ok = true;
+      }
+    } catch (_) {
+      ok = false;
+    }
+    if (!ok) {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.setAttribute("readonly", "");
+      ta.style.position = "fixed";
+      ta.style.left = "-9999px";
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        ok = Boolean(document.execCommand("copy"));
+      } catch (_) {
+        ok = false;
+      }
+      ta.remove();
+    }
+    showToast(ok ? (successMsg || "Copied to clipboard") : "Clipboard blocked — copy manually from code panel");
+    return ok;
+  }
+
   function initChrome() {
     document.querySelectorAll("[data-theme-toggle]").forEach((btn) => {
       btn.addEventListener("click", () => {
@@ -57,5 +104,5 @@
     initChrome();
   }
 
-  window.MotionLabApp = { applyTheme };
+  window.MotionLabApp = { applyTheme, copyText, showToast };
 })();

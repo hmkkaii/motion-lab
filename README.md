@@ -1,63 +1,112 @@
-# Motion Lab
+# Motion Lab v2.0
 
-An independent, zero-dependency interactive UI motion playground and parameter workbench built with semantic HTML, CSS custom properties, and Vanilla JavaScript.
+**Building blocks for interactive UI, ready to use as a library, Agent Skill, or MCP server with Claude Code, Cursor, Codex, and Antigravity.**
+
+Zero-dependency semantic HTML, CSS custom properties, and Vanilla JavaScript — with live clickable previews, real-time parameter tuning, and machine-readable AI endpoints.
 
 - **Live Website**: https://17860288878k-debug.github.io/motion-lab/
+- **Interactive UI Components**: https://17860288878k-debug.github.io/motion-lab/components.html
+- **Skill & MCP Setup Hub**: https://17860288878k-debug.github.io/motion-lab/ai.html
+- **Machine Registry (`registry.json`)**: https://17860288878k-debug.github.io/motion-lab/registry.json
+- **LLM Index (`llms.txt`)**: https://17860288878k-debug.github.io/motion-lab/llms.txt
 - **Repository**: https://github.com/17860288878k-debug/motion-lab
 
 ---
 
-## Features
+## What's Included (20 Live Interactive Blocks)
 
-- **12 Live Interactive Motion Studies** across 4 categories (`Surfaces`, `Navigation`, `Feedback`, `Micro-Motion`) — every card triggers real CSS/JS animations (Click, Hover, Open, Close, Replay, Mid-flight Interruption).
-- **Dedicated Workbench (`study.html?id=<slug>`)** for every study with:
-  - Live CSS variable tuning sliders (duration, distance, scale, blur, stagger)
-  - Interactive cubic-bezier curve selector + real-time SVG curve plot
-  - Playback speed control (`1×`, `0.5×`, `0.25×` slow-motion)
-  - Live `prefers-reduced-motion` simulator
-  - Live interaction telemetry log & active CSS token readout
-- **Easing Curve Race Track (`tokens.html`)** to compare 6 core easing curves side-by-side at any duration.
-- **Light & Dark Themes**, responsive desktop & mobile layouts, self-hosted SIL OFL 1.1 typography (`Inter` & `Roboto Mono`), and zero backend dependencies.
+### 12 Interactive Motion Studies (`index.html` + `study.html`)
+- **Surfaces**: `adaptive-card`, `origin-menu`, `scale-dialog`
+- **Navigation**: `sliding-tabs`, `accordion-disclosure`, `page-transition`
+- **Feedback**: `toast-stack`, `validation-shake`, `confirm-check`
+- **Micro-Motion**: `spring-like`, `drum-counter`, `hover-cluster`
+- Every study opens in a dedicated **Workbench** with live CSS sliders, cubic-bezier SVG plot, slow-motion (`1×`, `0.5×`, `0.25×`), `prefers-reduced-motion` simulator, and one-click **Copy CSS** / **Copy for AI**.
+
+### 8 Interactive UI Showcase Components (`components.html`)
+- **Pulse Climate Dial** (`pulse-climate`): 36-tick radial thermostat, glowing arc, stepper buttons, and Eco / Comfort / Warm Glow pill.
+- **Orbit Live Flight Pass** (`orbit-flight`): Cobalt great-circle Bezier route tracker with tangent aircraft icon and live gate tabs.
+- **Tempo Spatial Audio Deck** (`tempo-audio`): Vinyl player with 18-bar animated equalizer and Studio / Warm / Spatial presets.
+- **Chroma Palette Studio** (`chroma-mesh`): Crossfading radial mesh studio with live OKLCH readout and one-click CSS copy.
+- **Focus Deep Work Timer** (`focus-timer`): SVG countdown ring with tabular digits and ambient sound toggles.
+- **Forge Edge Deploy Pipeline** (`forge-deploy`): 4-stage staggered release cascade with spring checkmarks.
+- **Design Shelf 3D Deck** (`shelf-books`): Perspective book cover-flow with reading progress bar and bookmark toggle.
+- **Relay Issue Triage Card** (`relay-triage`): Priority escalation, Ship PR morph, QA progress bar, and reaction counters.
+
+### Easing Curve Lab (`tokens.html`)
+- Synchronized 6-curve race track (`--ease-smooth-out`, `--ease-bounce`, `--ease-pop`, `--ease-bounce-strong`, `--ease-in-out`, `--ease-out`) + one-click **Copy `:root` Tokens**.
+
+---
+
+## Use with AI Coding Agents (Claude Code, Cursor, Codex, Antigravity)
+
+### Option A: Zero-Install via `llms.txt` / `registry.json`
+Paste into any AI coding agent with web fetch:
+
+> Read `https://17860288878k-debug.github.io/motion-lab/llms.txt` and `https://17860288878k-debug.github.io/motion-lab/registry.json`, then implement `"origin-menu"` and `"pulse-climate"` in my project using Motion Lab's exact cubic-bezier curves and reduced-motion guards.
+
+### Option B: Install the Agent Skill (`SKILL.md`)
+```bash
+git clone https://github.com/17860288878k-debug/motion-lab.git ~/motion-lab
+
+# Claude Code
+mkdir -p ~/.claude/skills/motion-lab
+cp ~/motion-lab/skills/motion-lab/SKILL.md ~/.claude/skills/motion-lab/SKILL.md
+
+# Codex CLI
+mkdir -p ~/.codex/skills/motion-lab
+cp ~/motion-lab/skills/motion-lab/SKILL.md ~/.codex/skills/motion-lab/SKILL.md
+```
+
+### Option C: Connect the Zero-Dependency MCP Server
+Two identical zero-dependency stdio MCP servers are included:
+- **Python 3** (no `pip install` needed): `mcp/motion-lab-mcp.py`
+- **Node.js ≥ 18** (no `npm install` needed): `mcp/motion-lab-mcp.mjs`
+
+**Claude Code:**
+```bash
+claude mcp add motion-lab -- python3 ~/motion-lab/mcp/motion-lab-mcp.py
+# or with Node.js >= 18:
+# claude mcp add motion-lab -- node ~/motion-lab/mcp/motion-lab-mcp.mjs
+```
+
+**Cursor (`.cursor/mcp.json`):**
+```json
+{
+  "mcpServers": {
+    "motion-lab": {
+      "command": "python3",
+      "args": ["/ABSOLUTE/PATH/TO/motion-lab/mcp/motion-lab-mcp.py"]
+    }
+  }
+}
+```
+
+**Codex CLI (`~/.codex/config.toml`):**
+```toml
+[mcp_servers.motion-lab]
+command = "python3"
+args = ["/ABSOLUTE/PATH/TO/motion-lab/mcp/motion-lab-mcp.py"]
+```
+
+**Exposed MCP Tools (5) & Resources (3):**
+- `list_motions(category?)`
+- `get_motion_spec(id)`
+- `list_components(category?)`
+- `get_component_code(id)`
+- `get_easing_tokens()`
+- Resources: `motion-lab://registry`, `motion-lab://tokens`, `motion-lab://llms`
 
 ---
 
 ## Local Development
 
-No build step or npm install is required. Serve with Python 3 (or any static HTTP server):
+No build step or package install is required:
 
 ```bash
 python3 -m http.server 8780 --bind 127.0.0.1
 ```
 
-Open `http://127.0.0.1:8780/`.
-
-To verify GitHub Pages subpath behavior locally (`/motion-lab/`), serve from the parent directory:
-
-```bash
-cd ..
-python3 -m http.server 8780 --bind 127.0.0.1
-```
-
-Then open `http://127.0.0.1:8780/motion-lab/`.
-
----
-
-## Editing & Updating the Site
-
-1. **Add or tune a Motion Study**:
-   - Edit metadata and slider schemas in `assets/js/studies-data.js`.
-   - Add or update styles/tokens in `assets/css/studies.css`.
-   - Add or update interactive behavior in `assets/js/studies-runtime.js`.
-2. **Edit site visual design or layout**:
-   - Update theme colors, typography, and spacing in `assets/css/design-system.css`.
-3. **Publish updates to GitHub Pages**:
-   ```bash
-   git status
-   git add .
-   git commit -m "feat: update motion studies"
-   git push origin main
-   ```
-   GitHub Pages automatically rebuilds and updates `https://17860288878k-debug.github.io/motion-lab/` within ~1 minute after pushing to `main`.
+To verify GitHub Pages subpath behavior (`/motion-lab/`), serve from the parent directory and open `http://127.0.0.1:8780/motion-lab/`.
 
 ---
 

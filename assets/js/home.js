@@ -11,6 +11,14 @@
   const categories = ["All", "Surfaces", "Navigation", "Feedback", "Micro-Motion"];
   let activeCategory = "All";
   let query = "";
+  let mountedInstances = [];
+
+  function unmountAll() {
+    mountedInstances.forEach((inst) => {
+      if (inst && typeof inst.destroy === "function") inst.destroy();
+    });
+    mountedInstances = [];
+  }
 
   function renderFilters() {
     filterWrap.innerHTML = categories.map((cat) => {
@@ -32,6 +40,7 @@
   }
 
   function renderGallery() {
+    unmountAll();
     const q = query.trim().toLowerCase();
     const list = window.MOTION_STUDIES.filter((s) => {
       const catOk = activeCategory === "All" || s.category === activeCategory;
@@ -66,15 +75,33 @@
           <p class="ml-card-desc">${study.tagline}</p>
           <div class="ml-card-foot">
             <span class="ml-card-spec">${study.specLabel}</span>
-            <a class="ml-open-link" href="./study.html?id=${encodeURIComponent(study.id)}">
-              <span>Workbench</span>
-              <span aria-hidden="true">→</span>
-            </a>
+            <div class="ml-card-foot-actions">
+              <button type="button" class="ml-mini-btn" data-copy-ai>Copy for AI</button>
+              <a class="ml-open-link" href="./study.html?id=${encodeURIComponent(study.id)}">
+                <span>Workbench</span>
+                <span aria-hidden="true">→</span>
+              </a>
+            </div>
           </div>
         </div>
       `;
+      article.querySelector("[data-copy-ai]").addEventListener("click", () => {
+        const prompt = [
+          `Implement Motion Lab study "${study.title}" (${study.id}).`,
+          `Category: ${study.category} | Spec: ${study.specLabel}`,
+          `Default Easing: ${study.defaultEasing}`,
+          `Triggers: ${study.triggers}`,
+          `Design Rationale: ${study.notes}`,
+          `Fetch full CSS/JS from: https://17860288878k-debug.github.io/motion-lab/registry.json (or call MCP tool get_motion_spec with id="${study.id}").`,
+          `Preserve mid-flight interruption safety and prefers-reduced-motion compliance.`
+        ].join("\n");
+        if (window.MotionLabApp) {
+          window.MotionLabApp.copyText(prompt, `Copied "${study.title}" AI spec`);
+        }
+      });
       gallery.appendChild(article);
-      window.MotionLabRuntime.mountStudy(study.id, article.querySelector("[data-stage]"));
+      const inst = window.MotionLabRuntime.mountStudy(study.id, article.querySelector("[data-stage]"));
+      mountedInstances.push(inst);
     });
   }
 

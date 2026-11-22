@@ -1,0 +1,67 @@
+# Motion Lab
+
+> Zero-dependency interactive UI motion playground and component catalog (12 live motion studies + 8 interactive UI widgets + 6 easing curves), ready to consume by humans and AI coding agents (Claude Code, Cursor, Codex, Antigravity) via `llms.txt`, `registry.json`, Agent Skill, or MCP server.
+
+## Machine-Readable Endpoints
+- [Complete Registry JSON](https://17860288878k-debug.github.io/motion-lab/registry.json): Structured JSON containing all 6 easing curves, 7 duration tokens, 12 motion studies (with CSS/JS), and 8 interactive UI components (with full HTML/CSS/JS).
+- [Full Single-File Reference](https://17860288878k-debug.github.io/motion-lab/llms-full.txt): Complete Markdown dump of every token, motion study, and interactive component in one fetch.
+- [Agent Skill (SKILL.md)](https://github.com/17860288878k-debug/motion-lab/blob/main/skills/motion-lab/SKILL.md): Installable skill instructions for Claude Code, Cursor, Codex, and Antigravity.
+- [MCP Server & Setup Guide](https://17860288878k-debug.github.io/motion-lab/ai.html): Copy-paste MCP setup for Python (`mcp/motion-lab-mcp.py`) and Node.js (`mcp/motion-lab-mcp.mjs`).
+
+## Live Interactive Pages
+- [Motion Studies Gallery (12 Studies)](https://17860288878k-debug.github.io/motion-lab/index.html): Live clickable previews across Surfaces, Navigation, Feedback, and Micro-Motion.
+- [Interactive UI Components (8 Widgets)](https://17860288878k-debug.github.io/motion-lab/components.html): Hands-on interactive controls, aviation pass, spatial audio deck, mesh studio, timer, edge deploy, 3D shelf, and issue triage card.
+- [Parameter Workbench](https://17860288878k-debug.github.io/motion-lab/study.html?id=adaptive-card): Live CSS variable tuning, slow-motion (1x / 0.5x / 0.25x), and reduced-motion simulator.
+- [Easing Curve Lab](https://17860288878k-debug.github.io/motion-lab/tokens.html): Synchronized 6-curve race track.
+
+## 12 Motion Studies
+- [Adaptive Card Resize](https://17860288878k-debug.github.io/motion-lab/study.html?id=adaptive-card) (`adaptive-card` · Surfaces · 300ms · smooth-out): Smooth width and height continuity when a surface toggles density.
+- [Origin-Aware Action Menu](https://17860288878k-debug.github.io/motion-lab/study.html?id=origin-menu) (`origin-menu` · Surfaces · 250ms in / 150ms out): Anchored popover growing from its trigger with asymmetric open and close timings.
+- [Focal Scale Dialog](https://17860288878k-debug.github.io/motion-lab/study.html?id=scale-dialog) (`scale-dialog` · Surfaces · 250ms in / 150ms out): Centered confirmation dialog pairing subtle 0.96 scale with a soft backdrop veil.
+- [Measured Sliding Tabs](https://17860288878k-debug.github.io/motion-lab/study.html?id=sliding-tabs) (`sliding-tabs` · Navigation · 250ms · measured pill): Segmented control whose active pill measures width and offset for fluid tracking.
+- [Grid-Row Accordion](https://17860288878k-debug.github.io/motion-lab/study.html?id=accordion-disclosure) (`accordion-disclosure` · Navigation · 250ms · 0fr ↔ 1fr): Intrinsic height disclosure driven by CSS grid-template-rows with synced chevron flip.
+- [Directional View Slide](https://17860288878k-debug.github.io/motion-lab/study.html?id=page-transition) (`page-transition` · Navigation · 250ms · ±10px + 3px blur): Forward and backward drill-down view swap with directional offset and cross-blur.
+- [Stacked Notification Banners](https://17860288878k-debug.github.io/motion-lab/study.html?id=toast-stack) (`toast-stack` · Feedback · 350ms in · Hover/Tap fan-out): Three-deep notification deck that rises in, recedes with depth blur, and fans on hover or tap.
+- [Segmented Validation Shake](https://17860288878k-debug.github.io/motion-lab/study.html?id=validation-shake) (`validation-shake` · Feedback · 280ms shake · 3s auto-revert): Tactile horizontal rejection shake on invalid input with automatic neutral recovery.
+- [Composed Success Check](https://17860288878k-debug.github.io/motion-lab/study.html?id=confirm-check) (`confirm-check` · Feedback · 500ms · 80ms stroke delay): Multi-track celebration combining fade, rotate, vertical bounce, de-blur, and SVG stroke draw.
+- [Spring Heart & Particle Burst](https://17860288878k-debug.github.io/motion-lab/study.html?id=spring-like) (`spring-like` · Micro-Motion · 350ms pop · 600ms burst): Overshoot spring pop paired with a nine-particle radial burst on positive toggle.
+- [3D Drum Counter](https://17860288878k-debug.github.io/motion-lab/study.html?id=drum-counter) (`drum-counter` · Micro-Motion · 520ms · 40ms stagger): Selective digit-roll counter where only changed digits animate with blur and stagger.
+- [Magnetic Avatar Wave & 3D Tilt](https://17860288878k-debug.github.io/motion-lab/study.html?id=hover-cluster) (`hover-cluster` · Micro-Motion · 320ms wave · 3D glare): Distance-falloff hover lift with bouncy return paired with pointer-tracked 3D card tilt.
+
+## 8 Interactive UI Components
+- [Pulse Climate Dial](https://17860288878k-debug.github.io/motion-lab/components.html#pulse-climate) (`pulse-climate` · Controls): Circular architectural thermostat with 36 precision ticks, glowing conic arc, stepper controls, and ambient mood switcher.
+- [Orbit Live Flight Pass](https://17860288878k-debug.github.io/motion-lab/components.html#orbit-flight) (`orbit-flight` · Cards): Cobalt aviation tracker with SVG great-circle flight path, pulsing radar plane indicator, and live boarding tab transition.
+- [Tempo Spatial Audio Deck](https://17860288878k-debug.github.io/motion-lab/components.html#tempo-audio) (`tempo-audio` · Media): Obsidian hi-fi vinyl player with 18-bar animated harmonic equalizer and color-shifting Studio / Warm / Spatial sound presets.
+- [Chroma Palette Studio](https://17860288878k-debug.github.io/motion-lab/components.html#chroma-mesh) (`chroma-mesh` · Creative): Multi-layer radial mesh gradient studio with crossfading Solstice / Cobalt / Matcha themes, live OKLCH readout, and one-click CSS copy.
+- [Focus Deep Work Timer](https://17860288878k-debug.github.io/motion-lab/components.html#focus-timer) (`focus-timer` · Productivity): Warm-paper Pomodoro timer with smooth SVG countdown ring, tabular digits, and Rain / Vinyl / Forest ambient chips.
+- [Forge Edge Deploy Pipeline](https://17860288878k-debug.github.io/motion-lab/components.html#forge-deploy) (`forge-deploy` · Developer): Interactive deployment card that cascades through 4 staggered build stages with spring checkmarks and live edge latency status.
+- [Design Shelf 3D Deck](https://17860288878k-debug.github.io/motion-lab/components.html#shelf-books) (`shelf-books` · Media): Tactile Swiss graphic book cover-flow with perspective depth stacking, synced reading progress bar, and spring bookmark toggle.
+- [Relay Issue Triage Card](https://17860288878k-debug.github.io/motion-lab/components.html#relay-triage) (`relay-triage` · Productivity): Linear-inspired engineering issue card with interactive priority escalation, Ship PR state morph, QA bar fill, and reaction toggles.
+
+## Core Motion Tokens
+```css
+:root {
+  --ml-speed: 1;
+  --duration-stagger: 40ms;
+  --duration-micro: 80ms;
+  --duration-quick: 150ms;
+  --duration-fast: 250ms;
+  --duration-medium: 350ms;
+  --duration-slow: 400ms;
+  --duration-very-slow: 500ms;
+
+  --ease-smooth-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.36, 0.64, 1);
+  --ease-pop: cubic-bezier(0.34, 1.96, 0.64, 1);
+  --ease-bounce-strong: cubic-bezier(0.34, 3.85, 0.64, 1);
+  --ease-in-out: cubic-bezier(0.42, 0, 0.58, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+}
+```
+
+## MCP Tools (`mcp/motion-lab-mcp.py` / `mcp/motion-lab-mcp.mjs`)
+- `list_motions(category?)`: List all 12 motion studies with specs and workbench URLs.
+- `get_motion_spec(id)`: Return exact tokens, rationale, CSS, and JS implementation for one study.
+- `list_components(category?)`: List all 8 interactive UI components with triggers and tokens.
+- `get_component_code(id)`: Return complete self-contained HTML/CSS/JS implementation for one component.
+- `get_easing_tokens()`: Return all 6 cubic-bezier curves, 7 durations, and `:root` CSS block.

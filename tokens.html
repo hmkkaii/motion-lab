@@ -4,11 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Curve Lab — Motion Lab</title>
-  <meta name="description" content="Compare UI easing curves side by side on a synchronized race track and inspect core motion token dimensions." />
+  <meta name="description" content="Compare UI easing curves side by side on a synchronized race track and copy ready-to-paste CSS motion tokens." />
   <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg" />
-  <link rel="stylesheet" href="./assets/fonts/fonts.css" />
-  <link rel="stylesheet" href="./assets/css/design-system.css" />
-  <link rel="stylesheet" href="./assets/css/studies.css" />
+  <link rel="stylesheet" href="./assets/fonts/fonts.css?v=2.0.0" />
+  <link rel="stylesheet" href="./assets/css/design-system.css?v=2.0.0" />
+  <link rel="stylesheet" href="./assets/css/studies.css?v=2.0.0" />
+  <link rel="stylesheet" href="./assets/css/components.css?v=2.0.0" />
 </head>
 <body>
   <header class="ml-header">
@@ -22,14 +23,16 @@
           </svg>
         </span>
         <span>Motion Lab</span>
-        <span class="ml-brand-tag">v1.0</span>
+        <span class="ml-brand-tag">v2.0</span>
       </a>
 
       <nav class="ml-nav" aria-label="Primary navigation">
         <a class="ml-nav-link" href="./index.html">Studies</a>
+        <a class="ml-nav-link" href="./components.html">Components</a>
         <a class="ml-nav-link" href="./study.html?id=adaptive-card">Workbench</a>
         <a class="ml-nav-link" href="./tokens.html" aria-current="page">Curve Lab</a>
-        <a class="ml-nav-link" href="./about.html">About &amp; Licenses</a>
+        <a class="ml-nav-link" href="./ai.html">Skill &amp; MCP</a>
+        <a class="ml-nav-link" href="./about.html">About</a>
       </nav>
 
       <div class="ml-header-actions">
@@ -47,9 +50,11 @@
 
   <nav class="ml-mobile-nav" data-mobile-nav aria-label="Mobile navigation">
     <a class="ml-nav-link" href="./index.html">Studies</a>
+    <a class="ml-nav-link" href="./components.html">Components</a>
     <a class="ml-nav-link" href="./study.html?id=adaptive-card">Workbench</a>
     <a class="ml-nav-link" href="./tokens.html" aria-current="page">Curve Lab</a>
-    <a class="ml-nav-link" href="./about.html">About &amp; Licenses</a>
+    <a class="ml-nav-link" href="./ai.html">Skill &amp; MCP</a>
+    <a class="ml-nav-link" href="./about.html">About</a>
   </nav>
 
   <main class="ml-main">
@@ -63,7 +68,7 @@
             architectural smooth-out deceleration and tactile spring overshoot.
           </p>
         </div>
-        <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
           <div class="ml-control" style="min-width:190px;">
             <div class="ml-control-label">
               <label for="race-duration">Duration</label>
@@ -72,6 +77,7 @@
             <input id="race-duration" class="ml-range" type="range" min="150" max="1500" step="50" value="650" />
           </div>
           <button type="button" class="ml-btn ml-btn-primary" id="btn-run-race">Launch Race</button>
+          <button type="button" class="ml-btn" id="btn-copy-tokens">Copy :root Tokens</button>
         </div>
       </div>
 
@@ -81,13 +87,18 @@
 
   <footer class="ml-footer">
     <div class="ml-container ml-footer-inner">
-      <div><strong>Motion Lab</strong> — Interactive UI Motion Workbench.</div>
-      <div><a href="./about.html">Licenses &amp; Attribution</a></div>
+      <div><strong>Motion Lab v2.0</strong> — Interactive UI Motion Workbench.</div>
+      <div>
+        <a href="./llms.txt">llms.txt</a> ·
+        <a href="./registry.json">registry.json</a> ·
+        <a href="./ai.html">Skill &amp; MCP</a> ·
+        <a href="./about.html">Licenses</a>
+      </div>
     </div>
   </footer>
 
-  <script src="./assets/js/app.js"></script>
-  <script src="./assets/js/studies-data.js"></script>
-  <script src="./assets/js/tokens-page.js"></script>
+  <script src="./assets/js/app.js?v=2.0.0"></script>
+  <script src="./assets/js/studies-data.js?v=2.0.0"></script>
+  <script src="./assets/js/tokens-page.js?v=2.0.0"></script>
 </body>
 </html>

@@ -1,0 +1,37 @@
+{
+  "name": "motion-lab",
+  "version": "2.0.0",
+  "description": "Zero-dependency interactive UI motion studies (12), tactile UI components (8), Agent Skill, and MCP server for Claude Code, Cursor, Codex, and Antigravity.",
+  "type": "module",
+  "license": "MIT",
+  "homepage": "https://17860288878k-debug.github.io/motion-lab/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/17860288878k-debug/motion-lab.git"
+  },
+  "bin": {
+    "motion-lab-mcp": "./mcp/motion-lab-mcp.mjs"
+  },
+  "files": [
+    "registry.json",
+    "llms.txt",
+    "llms-full.txt",
+    "skills/motion-lab/SKILL.md",
+    "mcp/motion-lab-mcp.mjs",
+    "mcp/motion-lab-mcp.py"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "motion",
+    "ui-components",
+    "animations",
+    "transitions",
+    "mcp",
+    "agent-skill",
+    "claude-code",
+    "cursor",
+    "codex"
+  ]
+}
